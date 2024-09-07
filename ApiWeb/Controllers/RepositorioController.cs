@@ -1,6 +1,10 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using System.Net;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,9 +37,17 @@ namespace ApiWeb.Controllers
 
         // POST api/<RepositorioController>
         [HttpPost]
-        public void Post([FromBody] Repositorio repositorio)
+        public IActionResult Post([FromBody] Repositorio repositorio)
         {
-            repositorioDB.Create(repositorio);
+            try
+            {
+                repositorioDB.Create(repositorio);
+                return Ok();
+            }
+            catch (MongoWriteException ex)
+            {                
+                return BadRequest(ex.WriteError.Message);
+            }                        
         }
 
         // PUT api/<RepositorioController>/5

@@ -18,15 +18,7 @@ namespace ApiWeb.Services
         public RepositorioService(IOptions<MongoDBSettings> options)
         {
             var client = new MongoClient(options.Value.ConnectionString);
-            db = client.GetDatabase(options.Value.DatabaseName);
-
-            //Test connectiom
-            try
-            {
-                var result = client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
-                System.Diagnostics.Debug.WriteLine("Pinged your deployment. You successfully connected to MongoDB!");
-            }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
+            db = client.GetDatabase(options.Value.DatabaseName);            
         }
 
 
@@ -35,8 +27,11 @@ namespace ApiWeb.Services
 
         public void Create(Repositorio repositorio)
         {
-            repositorioCollection.InsertOne(repositorio);
-            //TODO: catch duplicate key exception , MongoDB.Driver.MongoWriteException
+            try
+            {
+                repositorioCollection.InsertOne(repositorio);
+            }
+            catch (MongoWriteException) { throw; }                      
         }
 
         public IEnumerable<Repositorio> getRepositorios()
