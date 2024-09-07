@@ -1,21 +1,44 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+
 
 namespace ApiWeb.Models
 {
     public class Repositorio
     {
         [BsonId]
-        //[BsonRepresentation(BsonType.ObjectId)]    it causes error of serialization, i.e  asigna un hash en ves de una string como id.               
-        public string? Id { get; set; } //TODO: the id must be composed by: userId-nombre       
-
-        
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+        [Required]
         public string Nombre { get; set; }
+        [Required]
+        public List<string> Tags { get; set; }
+        [Required]
+        public string UsuarioId { get; set; }
+        [Required]
+        public string Visibilidad { get; set; }        
+        public List<Branch> Branches { get; set; }
 
-        public string Tags { get; set; }
+        public Repositorio(string? id, string nombre, List<string> tags, string usuarioId, string visibilidad, List<Branch> branches)
+        {            
+            Nombre = nombre;
+            Tags = tags;
+            UsuarioId = usuarioId;
+            Visibilidad = visibilidad;            
+            if (branches.IsNullOrEmpty())
+            {                
+                Branches = [new Branch("Master", null)];
+            }
+            else
+            {
+                Branches = branches;
+            }
+        }        
 
-        public int UserId { get; set; }
-
-        public string Visibilidad { get; set; }
 
         //faltan branches
         //tags tiene que ser array
