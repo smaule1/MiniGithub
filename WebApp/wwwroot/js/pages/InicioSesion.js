@@ -4,7 +4,7 @@ function InicioSesionController() {
     this.InitView = function () {
         console.log("Login view init!");
 
-        // Evento para el botón de iniciar sesión
+        // Evento para el botï¿½n de iniciar sesiï¿½n
         $("#btnIniciarSesion").click(() => {
             console.log("Clicked");
             this.IniciarSesion();
@@ -27,12 +27,12 @@ function InicioSesionController() {
 
             if (data != null) {
                 sessionStorage.setItem("Usuario", JSON.stringify(data)); // Cambiado a sessionStorage
-                window.location.href = "Contenido"; // Redirecciona a la página de contenido después de iniciar sesión.
+                window.location.href = "Contenido"; // Redirecciona a la pï¿½gina de contenido despuï¿½s de iniciar sesiï¿½n.
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Usuario o contraseña incorrectos',
+                    text: 'Usuario o contraseï¿½a incorrectos',
                 });
             }
         });

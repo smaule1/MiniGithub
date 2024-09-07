@@ -5,11 +5,11 @@ function RegistroContenidoController() {
     this.InitView = function () {
         console.log("Contenido view init!");
 
-        // Evento para el botón de registrar contenido
+        // Evento para el botï¿½n de registrar contenido
         $("#btnRegistrarContenido").click(() => {
             console.log("Clicked");
 
-            // Llama directamente al método RegistrarContenido en lugar de crear una nueva instancia
+            // Llama directamente al mï¿½todo RegistrarContenido en lugar de crear una nueva instancia
             this.RegistrarContenido();
             window.location.href = "Contenido";
         });
@@ -29,8 +29,8 @@ function RegistroContenidoController() {
         ca.PostToAPI(service, contenido, () => {
             console.log("Contenido registrado!");
 
-            // Redirige a la página de "Contenido" después de registrar el contenido
-             // Cambia "Contenido" a la ruta correcta de tu página de contenido
+            // Redirige a la pï¿½gina de "Contenido" despuï¿½s de registrar el contenido
+             // Cambia "Contenido" a la ruta correcta de tu pï¿½gina de contenido
         });
     }
 }
@@ -42,8 +42,8 @@ $(document).ready(() => {
     // Verifica si hay un usuario logueado
     var usuario = sessionStorage.getItem("Usuario");
     if (usuario == null) {
-        // Si no hay sesión activa, redirige al usuario a la página de inicio de sesión
-        window.location.href = "HomePage"; // Cambia "HomePage" a la ruta correcta de tu página de inicio de sesión
+        // Si no hay sesiï¿½n activa, redirige al usuario a la pï¿½gina de inicio de sesiï¿½n
+        window.location.href = "HomePage"; // Cambia "HomePage" a la ruta correcta de tu pï¿½gina de inicio de sesiï¿½n
     }
     console.log(localStorage.getItem("Usuario"));
 });

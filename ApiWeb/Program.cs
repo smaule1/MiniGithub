@@ -1,3 +1,7 @@
+using ApiWeb.Data;
+using ApiWeb.Controllers;
+using ApiWeb.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,6 +22,13 @@ builder.Services.AddCors(options =>
                    .AllowAnyHeader();
         });
 });
+
+//Links the class MongoDBSettings with the properties in appsetting.json
+builder.Services.Configure<MongoDBSettings>(
+    builder.Configuration.GetSection("MongoDB"));
+
+//RepositorioDBContext needs to be Singleton, otherwise it crashes
+builder.Services.AddSingleton<RepositorioService>();
 
 var app = builder.Build();
 
