@@ -17,7 +17,7 @@ namespace ApiWeb.Models
         public string Nombre { get; set; }
         [Required]
         public List<string> Tags { get; set; }
-        [Required]
+        [Required]    
         public string UsuarioId { get; set; }
         [Required]
         public string Visibilidad { get; set; }        

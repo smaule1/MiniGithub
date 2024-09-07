@@ -36,7 +36,7 @@ namespace ApiWeb.Services
         public void Create(Repositorio repositorio)
         {
             repositorioCollection.InsertOne(repositorio);
-            //TODO: catch duplicate key exception
+            //TODO: catch duplicate key exception , MongoDB.Driver.MongoWriteException
         }
 
         public IEnumerable<Repositorio> getRepositorios()
