@@ -38,6 +38,25 @@ namespace ApiWeb.Services
         {
             return repositorioCollection.Find(a => true).ToList();
         }
+
+        //Methods used to commit
+        //Agregado aquí por solo una conexión a MongoDB
+        public IMongoCollection<Commit> commitCollection =>
+            db.GetCollection<Commit>("commits");
+
+        public IEnumerable<Commit> getCommits()
+        {
+            return commitCollection.Find(a => true).ToList();
+        }
+
+        public void CreateCommit(Commit commit)
+        {
+            try
+            {
+                commitCollection.InsertOne(commit);
+            }
+            catch (MongoWriteException) { throw; }
+        }
     }
 }
 
