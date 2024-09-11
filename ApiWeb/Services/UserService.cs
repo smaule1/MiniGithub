@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using ApiWeb.Models;
 using System.Text.Json;
 using MongoDB.Bson.Serialization.IdGenerators;
+using NuGet.Versioning;
 
 namespace ApiWeb.Services
 {
@@ -27,6 +28,25 @@ namespace ApiWeb.Services
             _lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
                 ConnectionMultiplexer.Connect("localhost")
             );
+        }
+
+        public IEnumerable<User?> GetUsers()
+        {
+            var db = Connection.GetDatabase();
+            var server = db.Multiplexer.GetServer("localhost", 6379);
+            var keys = server.Keys();
+
+            return keys.Select(k =>
+            {
+                var value = db.StringGet(k);
+
+                if (value.IsNullOrEmpty)
+                {
+                    return null;
+                }
+
+                return JsonSerializer.Deserialize<User>(value);
+            });
         }
 
         public void CreateUser(User user)
@@ -66,7 +86,7 @@ namespace ApiWeb.Services
                 db.KeyDelete(email);
             } else
             {
-                throw new InvalidOperationException("Email does not belong to any user.");
+                throw new InvalidOperationException("Email does not belong to an existing user.");
             }
         }
     }

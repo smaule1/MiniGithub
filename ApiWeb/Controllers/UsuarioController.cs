@@ -1,8 +1,9 @@
-﻿using CoreApp;
-using DataAcces.CRUD;
-using DTOs;
-using Microsoft.AspNetCore.Identity;
+﻿using ApiWeb.Models;
+using ApiWeb.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
+using System.Net;
 
 namespace ApiWeb.Controllers
 {
@@ -12,119 +13,57 @@ namespace ApiWeb.Controllers
 
     public class UsuarioController : ControllerBase
     {
+        private readonly UserService userDb;
+
+        public UsuarioController(UserService userDb)
+        {
+            this.userDb = userDb;
+        }
 
         [HttpGet]
-        [Route("RetrieveByID")]
-        public ActionResult RetrieveById(int id)
+        public IEnumerable<User?> Get()
         {
-            try
-            {
-                var usuario = new UsuarioManager();
-                var result = usuario.RetrieveById(id);
-                return Ok(result);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return userDb.GetUsers();
         }
 
-		[HttpGet]
-		[Route("RetrieveAll")]
-		public ActionResult RetrieveAll()
-		{
-			try
-			{
-				var usuario = new UsuarioManager();
-				var result = usuario.RetrieveAll();
-				return Ok(result);
-
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(ex.Message);
-			}
-		}
-
-		[HttpPost]
-        [Route("Create")]
-        public ActionResult Create(Usuario usuario)
+        [HttpGet("{id}")]
+        public User? Get(string id)
         {
-            try
-            {
-                var user = new UsuarioManager();
-                user.Create(usuario);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPut]
-        [Route("Update")]
-        public ActionResult Update(Usuario usuario)
-        {
-            try
-            {
-                var user = new UsuarioManager();
-                user.Update(usuario);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpDelete]
-        [Route("Delete")]
-        public ActionResult Delete(Usuario usuario)
-        {
-            try
-            {
-                var user = new UsuarioManager();
-                user.Delete(usuario);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return userDb.GetUser(id);
         }
 
         [HttpPost]
-        [Route("Login")]
-        public ActionResult Login(string Email, string Password)
+        public IActionResult Create([FromBody] User user)
         {
             try
             {
-
-                var um = new UsuarioManager();
-
-                var user = um.Login(Email, Password);
-
-                if (user == null)
-                {
-                    return BadRequest("Usuario invalido");
-                }
-                else
-                {
-
-                    return Ok(user);
-                }
-
+                userDb.CreateUser(user);
+                return Ok();
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
+        [HttpPut("{id}")]
+        public void Put(string id, [FromBody] string value)
+        {
+        }
 
 
-
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            try
+            {
+                userDb.DeleteUser(id);
+                return Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
