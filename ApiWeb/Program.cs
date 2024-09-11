@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
 
 //Links the class MongoDBSettings with the properties in appsetting.json
 builder.Services.Configure<MongoDBSettings>(
-    builder.Configuration.GetSection("MongoDB"));
+builder.Configuration.GetSection("MongoDB"));
 
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
 builder.Services.AddSingleton<RepositorioService>();

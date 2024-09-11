@@ -40,7 +40,7 @@ namespace ApiWeb.Controllers
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest("Duplicate Key Error: Combination of Nombre and UsuarioId already exists.");
+                    return BadRequest("Duplicate Key Error.");
                 return BadRequest(ex.WriteError);
             }
         }

@@ -14,16 +14,18 @@ namespace ApiWeb.Services
         //Does database operations related with Repositorio model
 
         public readonly IMongoDatabase db;
+        private readonly IDictionary<string, string> collectionNames;
 
         public RepositorioService(IOptions<MongoDBSettings> options)
         {
             var client = new MongoClient(options.Value.ConnectionString);
-            db = client.GetDatabase(options.Value.DatabaseName);            
+            db = client.GetDatabase(options.Value.DatabaseName);
+            collectionNames = options.Value.Collections;
         }
 
 
         public IMongoCollection<Repositorio> repositorioCollection =>
-            db.GetCollection<Repositorio>("repositorios");
+            db.GetCollection<Repositorio>(collectionNames["Collection1"]);
 
         public void Create(Repositorio repositorio)
         {
@@ -42,7 +44,7 @@ namespace ApiWeb.Services
         //Methods used to commit
         //Agregado aquí por solo una conexión a MongoDB
         public IMongoCollection<Commit> commitCollection =>
-            db.GetCollection<Commit>("commits");
+             db.GetCollection<Commit>(collectionNames["Collection2"]);
 
         public IEnumerable<Commit> getCommits()
         {
