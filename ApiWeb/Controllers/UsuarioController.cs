@@ -47,8 +47,17 @@ namespace ApiWeb.Controllers
         }
 
         [HttpPut("{id}")]
-        public void Put(string id, [FromBody] string value)
+        public IActionResult Put(string id, [FromBody] User user)
         {
+            try
+            {
+                userDb.EditUser(id, user);
+                return Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 

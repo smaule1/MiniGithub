@@ -7,6 +7,7 @@ using ApiWeb.Models;
 using System.Text.Json;
 using MongoDB.Bson.Serialization.IdGenerators;
 using NuGet.Versioning;
+using Amazon.Runtime.Internal.Transform;
 
 namespace ApiWeb.Services
 {
@@ -75,6 +76,30 @@ namespace ApiWeb.Services
             }
 
             return JsonSerializer.Deserialize<User>(userString);
+        }
+
+        public void EditUser(string email, User user)
+        {
+            var db = Connection.GetDatabase();
+
+            if (db.KeyExists(email))
+            {
+                if (email == user.Email)
+                {
+                    var newUser = new User(email, user.Password, user.Name, user.Id);
+                    string userString = JsonSerializer.Serialize(newUser);
+
+                    db.StringSet(email, userString);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Attempting to modify an user without authorization.");
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Requested user does not exist.");
+            }
         }
 
         public void DeleteUser(string email)
