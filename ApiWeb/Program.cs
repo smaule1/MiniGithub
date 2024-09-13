@@ -29,6 +29,7 @@ builder.Services.Configure<MongoDBSettings>(
 
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
 builder.Services.AddSingleton<RepositorioService>();
+builder.Services.AddSingleton<CommentService>();
 
 var app = builder.Build();
 
