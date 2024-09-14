@@ -4,6 +4,7 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using NuGet.Protocol.Core.Types;
 using System.Net;
 
 
@@ -83,9 +84,19 @@ namespace ApiWeb.Controllers
 
         // DELETE api/<RepositorioController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(string id)
         {
             //TODO: Authentication, how public repos are deleted? when no one is suscribed?
+            try
+            {
+                repositorioDB.Delete(id);
+                return Ok();
+            }
+            catch (System.FormatException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
 

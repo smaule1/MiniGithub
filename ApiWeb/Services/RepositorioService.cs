@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OpenApi;
 using ApiWeb.Data;
 using static MongoDB.Driver.WriteConcern;
+using NuGet.Protocol.Core.Types;
 
 namespace ApiWeb.Services
 {
@@ -49,11 +50,20 @@ namespace ApiWeb.Services
             catch (MongoWriteException) { throw; }
         }
 
-
-
         public IEnumerable<Repositorio> GetAllRepositorios()
         {
             return repositorioCollection.Find(a => true).ToList();
+        }
+
+        internal DeleteResult Delete(string id)
+        {
+            var filter = Builders<Repositorio>.Filter.Eq(repositorio => repositorio.Id, id);
+
+            try
+            {
+                return repositorioCollection.DeleteOne(filter);
+            }catch(System.FormatException) { throw; }
+            
         }
     }
 }
