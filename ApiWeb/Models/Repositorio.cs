@@ -15,15 +15,15 @@ namespace ApiWeb.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
         [Required]
-        public string Nombre { get; set; }
-        [Required]                
-        public List<string> Tags { get; set; }
-        [Required]
         public string UsuarioId { get; set; }
         [Required]
+        public string Nombre { get; set; }
+        [Required]                
+        public List<string> Tags { get; set; }        
+        [Required]
         [AllowedValues(["Public","Private"])]        
-        public string Visibilidad { get; set; }                
-        public List<Branch> Branches { get; set; }
+        public string Visibilidad { get; set; }        
+        public List<Branch>? Branches { get; set; }
 
 
         public void validateCreate()

@@ -65,12 +65,12 @@ namespace ApiWeb.Controllers
 
         // PUT api/<RepositorioController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Repositorio repositorio)
+        public IActionResult Put(string id, [FromBody] Repositorio repositorio)
         {
             //TODO: Authentication
             try
             {
-                //aaaa falta esta weaaa
+                repositorioDB.Update(repositorio, id);
                 return Ok();
             }
             catch (MongoWriteException ex)

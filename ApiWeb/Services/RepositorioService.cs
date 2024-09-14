@@ -35,11 +35,16 @@ namespace ApiWeb.Services
             catch (MongoWriteException) { throw; }                      
         }
 
-        public void Update(Repositorio repositorio, string id)
+        public UpdateResult Update(Repositorio repositorio, string id)
         {
             try
             {
+                var filter = Builders<Repositorio>.Filter.Eq(repositorio => repositorio.Id, id);
+                var update = Builders<Repositorio>.Update.Set(repositorio => repositorio.Nombre, repositorio.Nombre).
+                                                          Set(repositorio => repositorio.Tags, repositorio.Tags).
+                                                          Set(repositorio => repositorio.Visibilidad, repositorio.Visibilidad);
                 
+                return repositorioCollection.UpdateOne(filter, update);
             }
             catch (MongoWriteException) { throw; }
         }
