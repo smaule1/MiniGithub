@@ -19,8 +19,9 @@ namespace ApiWeb.Models
         public List<string> Tags { get; set; } 
         [Required]    
         public string UsuarioId { get; set; }
-        [Required]        
-        public string Visibilidad { get; set; }         //TODO: the accepted values for visibilidad should be (public, private)
+        [Required]
+        [AllowedValues(["Public","Private"])]
+        public string Visibilidad { get; set; }         
         public List<Branch> Branches { get; set; }
 
         // poste constructor
