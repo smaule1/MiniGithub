@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
 
 
 namespace ApiWeb.Models
@@ -15,34 +16,24 @@ namespace ApiWeb.Models
         public string? Id { get; set; }
         [Required]
         public string Nombre { get; set; }
+        [Required]                
+        public List<string> Tags { get; set; }
         [Required]
-        public List<string> Tags { get; set; } 
-        [Required]    
         public string UsuarioId { get; set; }
         [Required]
-        [AllowedValues(["Public","Private"])]
-        public string Visibilidad { get; set; }         
+        [AllowedValues(["Public","Private"])]        
+        public string Visibilidad { get; set; }                
         public List<Branch> Branches { get; set; }
 
-        // poste constructor
-        public Repositorio(string? id, string nombre, List<string> tags, string usuarioId, string visibilidad, List<Branch> branches)
-        {            
-            // id is not used assigned because Mongo assigns the ObjectId automatically
-            Nombre = nombre;
-            Tags = tags;
-            UsuarioId = usuarioId; //TODO: this has to be assigned according to the currently logged user.
-            Visibilidad = visibilidad; 
 
-            // repos must always have 1 branch available
-            // if no branch is inserted then it is created
-            if (branches.IsNullOrEmpty())
-            {                
-                Branches = [new Branch("Master", null)];
-            }
-            else
+        public void validateCreate()
+        {
+            Id = null;
+            if (Branches.IsNullOrEmpty())
             {
-                Branches = branches;
-            }
-        }                                
+                Branches = [new Branch("Master", null)];
+            }            
+        }
+                
     }
 }

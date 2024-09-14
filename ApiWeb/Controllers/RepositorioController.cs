@@ -28,7 +28,7 @@ namespace ApiWeb.Controllers
         [HttpGet]
         public IEnumerable<Repositorio> Get()
         {
-            return repositorioDB.getRepositorios();     //TODO: this request is just for debugging purposes, should not be used in final version
+            return repositorioDB.GetAllRepositorios();     //TODO: this request is just for debugging purposes, should not be used in final version
         }
 
         // GET api/<RepositorioController>/5
@@ -51,6 +51,7 @@ namespace ApiWeb.Controllers
             //TODO: Authentication
             try
             {
+                repositorio.validateCreate();
                 repositorioDB.Create(repositorio);
                 return Ok();
             }
@@ -64,9 +65,20 @@ namespace ApiWeb.Controllers
 
         // PUT api/<RepositorioController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, [FromBody] Repositorio repositorio)
         {
             //TODO: Authentication
+            try
+            {
+                //aaaa falta esta weaaa
+                return Ok();
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return BadRequest("Duplicate Key Error: Combination of Nombre and UsuarioId already exists.");
+                return BadRequest(ex.WriteError);
+            }
         }
 
         // DELETE api/<RepositorioController>/5
@@ -76,7 +88,11 @@ namespace ApiWeb.Controllers
             //TODO: Authentication, how public repos are deleted? when no one is suscribed?
         }
 
+
+
         //TODO: CRUD BRANCH
+
+
 
     }
 }

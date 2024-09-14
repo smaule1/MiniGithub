@@ -6,6 +6,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OpenApi;
 using ApiWeb.Data;
+using static MongoDB.Driver.WriteConcern;
 
 namespace ApiWeb.Services
 {
@@ -26,7 +27,7 @@ namespace ApiWeb.Services
             db.GetCollection<Repositorio>("repositorios");
 
         public void Create(Repositorio repositorio)
-        {
+        {            
             try
             {
                 repositorioCollection.InsertOne(repositorio);
@@ -34,7 +35,18 @@ namespace ApiWeb.Services
             catch (MongoWriteException) { throw; }                      
         }
 
-        public IEnumerable<Repositorio> getRepositorios()
+        public void Update(Repositorio repositorio, string id)
+        {
+            try
+            {
+                
+            }
+            catch (MongoWriteException) { throw; }
+        }
+
+
+
+        public IEnumerable<Repositorio> GetAllRepositorios()
         {
             return repositorioCollection.Find(a => true).ToList();
         }
