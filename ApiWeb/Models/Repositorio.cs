@@ -16,19 +16,24 @@ namespace ApiWeb.Models
         [Required]
         public string Nombre { get; set; }
         [Required]
-        public List<string> Tags { get; set; }
+        public List<string> Tags { get; set; } 
         [Required]    
         public string UsuarioId { get; set; }
-        [Required]
-        public string Visibilidad { get; set; }        
+        [Required]        
+        public string Visibilidad { get; set; }         //TODO: the accepted values for visibilidad should be (public, private)
         public List<Branch> Branches { get; set; }
 
+        // poste constructor
         public Repositorio(string? id, string nombre, List<string> tags, string usuarioId, string visibilidad, List<Branch> branches)
         {            
+            // id is not used assigned because Mongo assigns the ObjectId automatically
             Nombre = nombre;
             Tags = tags;
-            UsuarioId = usuarioId;
-            Visibilidad = visibilidad;            
+            UsuarioId = usuarioId; //TODO: this has to be assigned according to the currently logged user.
+            Visibilidad = visibilidad; 
+
+            // repos must always have 1 branch available
+            // if no branch is inserted then it is created
             if (branches.IsNullOrEmpty())
             {                
                 Branches = [new Branch("Master", null)];
@@ -37,11 +42,6 @@ namespace ApiWeb.Models
             {
                 Branches = branches;
             }
-        }        
-
-
-        //faltan branches
-        //tags tiene que ser array
-        //en general todo esta mal y hay que cambiarlo despues
+        }                                
     }
 }

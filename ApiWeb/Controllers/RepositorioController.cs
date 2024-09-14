@@ -1,5 +1,6 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
+using Azure.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
@@ -19,13 +20,15 @@ namespace ApiWeb.Controllers
         {
             this.repositorioDB = repositorioDB;
         }
+        
+
 
 
         // GET: api/<RepositorioController>
         [HttpGet]
         public IEnumerable<Repositorio> Get()
         {
-            return repositorioDB.getRepositorios();
+            return repositorioDB.getRepositorios();     //TODO: this request is just for debugging purposes, should not be used in final version
         }
 
         // GET api/<RepositorioController>/5
@@ -35,10 +38,17 @@ namespace ApiWeb.Controllers
             return "value";
         }
 
+        //TODO: GET all public repos
+
+        //TODO: GET all private repos by user_id, Authentication
+
+        //TODO GET all public repos the user is suscribed, needs request to the graph database, Authentication
+
         // POST api/<RepositorioController>
         [HttpPost]
-        public IActionResult Post([FromBody] Repositorio repositorio)
+        public IActionResult Post([FromBody] Repositorio repositorio)  //maybe change for attributes
         {
+            //TODO: Authentication
             try
             {
                 repositorioDB.Create(repositorio);
@@ -56,12 +66,17 @@ namespace ApiWeb.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
+            //TODO: Authentication
         }
 
         // DELETE api/<RepositorioController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            //TODO: Authentication, how public repos are deleted? when no one is suscribed?
         }
+
+        //TODO: CRUD BRANCH
+
     }
 }
