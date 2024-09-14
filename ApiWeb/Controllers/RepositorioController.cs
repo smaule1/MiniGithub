@@ -28,9 +28,10 @@ namespace ApiWeb.Controllers
         [HttpGet("getPublic/byId/{id}")]
         public IActionResult GetPublicById(string id)
         {
-            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id."); 
-            
-            return Ok(repositorioDB.GetPublicRepositorioById(id));                       
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+            var repositorio = repositorioDB.GetPublicRepositorioById(id);
+
+            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
         }
 
         //GET public repo by name        
@@ -43,12 +44,27 @@ namespace ApiWeb.Controllers
 
         //TODO GET all public repos the user is suscribed, needs request to the graph database, Authentication
 
-        //TODO: GET all private repos by user_id, Authentication
-        //TODO: GET private repos by id & user_id, Authentication
-
-       
-
         
+        //GET private repo by id
+        [HttpGet("getPrivate/{user_id}")]
+        public IEnumerable<Repositorio> GetAllPrivate(string user_id)
+        {
+            return repositorioDB.GetAllPrivateRepositorio(user_id);
+        }
+        
+        //GET private repos by id & user_id, Authentication         
+        [HttpGet("getPrivate/{user_id}/byId/{id}")]
+        public IActionResult GetPrivateById(string user_id, string id)
+        {
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+            var repositorio = repositorioDB.GetPrivateRepositorioById(user_id, id);
+            
+            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);                   
+        }
+
+
+
+
 
         // POST api/<RepositorioController>
         [HttpPost]

@@ -50,27 +50,20 @@ namespace ApiWeb.Services
             catch (MongoWriteException) { throw; }
         }        
 
-        internal DeleteResult Delete(string id)
+        public DeleteResult Delete(string id)
         {
             var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
-
-            try
-            {
-                return repositorioCollection.DeleteOne(filter);
-            }catch(System.FormatException) { throw; }
             
+            return repositorioCollection.DeleteOne(filter);                        
         }
 
-        internal Repositorio GetPublicRepositorioById(string id)
+        public Repositorio GetPublicRepositorioById(string id)
         {
             var builder = Builders<Repositorio>.Filter;
             var filter = builder.Eq(x => x.Visibilidad, "public") &  
                          builder.Eq(x => x.Id, id);
-            try
-            {
-                return repositorioCollection.Find(filter).First();
-            }
-            catch (System.FormatException) { throw; }            
+            
+            return repositorioCollection.Find(filter).FirstOrDefault();            
         }
 
         public IEnumerable<Repositorio> GetPublicRepositorioByName(string name)
@@ -79,6 +72,25 @@ namespace ApiWeb.Services
             var filter = builder.Regex(x => x.Nombre, $"/.*{name}.*/") &   //TODO: use Mongo's search index
                          builder.Eq(x => x.Visibilidad, "public");
             return repositorioCollection.Find(filter).ToList();
+        }
+
+        public IEnumerable<Repositorio> GetAllPrivateRepositorio(string user_id)
+        {
+            var builder = Builders<Repositorio>.Filter;
+            var filter = builder.Eq(x => x.Visibilidad, "private") &
+                         builder.Eq(x => x.UsuarioId, user_id);
+
+            return repositorioCollection.Find(filter).ToList();
+        }
+
+        public Repositorio GetPrivateRepositorioById(string user_id, string id)
+        {
+            var builder = Builders<Repositorio>.Filter;
+            var filter = builder.Eq(x => x.Visibilidad, "private") &
+                         builder.Eq(x => x.UsuarioId, user_id) &
+                         builder.Eq(x => x.Id, id);
+
+            return repositorioCollection.Find(filter).FirstOrDefault();
         }
     }
 }
