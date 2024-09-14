@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Cassandra.Mapping.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiWeb.Models
 {
@@ -8,13 +9,14 @@ namespace ApiWeb.Models
         public string User { get; set; }
         [Required]
         public string Message { get; set; }
-        public DateTime Last_date { get; set; }
+        public DateTimeOffset LastDate { get; set; }
 
-        public Subcomment(string user, string message, DateTime date)
+        public Subcomment() { }
+        public Subcomment(string user, string message, DateTimeOffset lastDate)
         {
             User = user;
             Message = message;
-            Last_date = date;
+            LastDate = lastDate;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ApiWeb.Models
 {
@@ -10,16 +11,25 @@ namespace ApiWeb.Models
         public string User {  get; set; }
         [Required]
         public string Message { get; set; }
-        public DateTime Last_date { get; set; }
-        [Required]
-        public List<Subcomment> Subcomments { get; set; }
+        public DateTimeOffset LastDate { get; set; }
+        public List<Subcomment>? Subcomments { get; set; }
 
-        public Comment(string user, string message, DateTime date, List<Subcomment> subcomments)
+        [JsonConstructor]
+        public Comment(Guid id, string user, string message, DateTimeOffset lastDate, List<Subcomment> subcomments)
+        {
+            Id = id;
+            User = user;
+            Message = message;
+            LastDate = lastDate;
+            Subcomments = subcomments;
+        }
+
+        public Comment(string user, string message, DateTimeOffset lastDate, List<Subcomment> subcomments)
         {
             Id = Guid.NewGuid();
             User = user;
             Message = message;
-            Last_date = date;
+            LastDate = lastDate;
             Subcomments = subcomments;
         }
     }

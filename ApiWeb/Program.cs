@@ -1,6 +1,7 @@
 using ApiWeb.Data;
 using ApiWeb.Controllers;
 using ApiWeb.Services;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,10 @@ builder.Services.AddCors(options =>
 //Links the class MongoDBSettings with the properties in appsetting.json
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDB"));
+
+//Links the class CassandraSettings with the properties in appsetting.json
+builder.Services.Configure<CassandraSettings>(
+    builder.Configuration.GetSection("Cassandra"));
 
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
 builder.Services.AddSingleton<RepositorioService>();
