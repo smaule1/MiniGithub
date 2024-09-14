@@ -40,30 +40,45 @@ namespace ApiWeb.Services
         {
             try
             {
-                var filter = Builders<Repositorio>.Filter.Eq(repositorio => repositorio.Id, id);
-                var update = Builders<Repositorio>.Update.Set(repositorio => repositorio.Nombre, repositorio.Nombre).
-                                                          Set(repositorio => repositorio.Tags, repositorio.Tags).
-                                                          Set(repositorio => repositorio.Visibilidad, repositorio.Visibilidad);
+                var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
+                var update = Builders<Repositorio>.Update.Set(x => x.Nombre, repositorio.Nombre).
+                                                          Set(x => x.Tags, repositorio.Tags).
+                                                          Set(x => x.Visibilidad, repositorio.Visibilidad);
                 
                 return repositorioCollection.UpdateOne(filter, update);
             }
             catch (MongoWriteException) { throw; }
-        }
-
-        public IEnumerable<Repositorio> GetAllRepositorios()
-        {
-            return repositorioCollection.Find(a => true).ToList();
-        }
+        }        
 
         internal DeleteResult Delete(string id)
         {
-            var filter = Builders<Repositorio>.Filter.Eq(repositorio => repositorio.Id, id);
+            var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
 
             try
             {
                 return repositorioCollection.DeleteOne(filter);
             }catch(System.FormatException) { throw; }
             
+        }
+
+        internal Repositorio GetPublicRepositorioById(string id)
+        {
+            var builder = Builders<Repositorio>.Filter;
+            var filter = builder.Eq(x => x.Visibilidad, "public") &  
+                         builder.Eq(x => x.Id, id);
+            try
+            {
+                return repositorioCollection.Find(filter).First();
+            }
+            catch (System.FormatException) { throw; }            
+        }
+
+        public IEnumerable<Repositorio> GetPublicRepositorioByName(string name)
+        {
+            var builder = Builders<Repositorio>.Filter;
+            var filter = builder.Regex(x => x.Nombre, $"/.*{name}.*/") &   //TODO: use Mongo's search index
+                         builder.Eq(x => x.Visibilidad, "public");
+            return repositorioCollection.Find(filter).ToList();
         }
     }
 }

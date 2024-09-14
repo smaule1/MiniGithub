@@ -21,29 +21,34 @@ namespace ApiWeb.Controllers
         {
             this.repositorioDB = repositorioDB;
         }
-        
 
 
 
-        // GET: api/<RepositorioController>
-        [HttpGet]
-        public IEnumerable<Repositorio> Get()
+        //GET public repo by id
+        [HttpGet("getPublic/byId/{id}")]
+        public IActionResult GetPublicById(string id)
         {
-            return repositorioDB.GetAllRepositorios();     //TODO: this request is just for debugging purposes, should not be used in final version
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id."); 
+            
+            return Ok(repositorioDB.GetPublicRepositorioById(id));                       
         }
 
-        // GET api/<RepositorioController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        //GET public repo by name        
+        [HttpGet("getPublic/byName/{name}")]
+        public IEnumerable<Repositorio> GetPublicByName(string name)
         {
-            return "value";
+            return repositorioDB.GetPublicRepositorioByName(name);
         }
 
-        //TODO: GET all public repos
-
-        //TODO: GET all private repos by user_id, Authentication
 
         //TODO GET all public repos the user is suscribed, needs request to the graph database, Authentication
+
+        //TODO: GET all private repos by user_id, Authentication
+        //TODO: GET private repos by id & user_id, Authentication
+
+       
+
+        
 
         // POST api/<RepositorioController>
         [HttpPost]
@@ -86,21 +91,13 @@ namespace ApiWeb.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            //TODO: Authentication, how public repos are deleted? when no one is suscribed?
-            try
-            {
-                repositorioDB.Delete(id);
-                return Ok();
-            }
-            catch (System.FormatException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+
+            return Ok(repositorioDB.Delete(id));
         }
 
 
-
+  
         //TODO: CRUD BRANCH
 
 

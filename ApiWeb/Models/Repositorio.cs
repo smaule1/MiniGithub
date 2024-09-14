@@ -21,7 +21,7 @@ namespace ApiWeb.Models
         [Required]                
         public List<string> Tags { get; set; }        
         [Required]
-        [AllowedValues(["Public","Private"])]        
+        [AllowedValues(["public","private"])]     //Replace for enum
         public string Visibilidad { get; set; }        
         public List<Branch>? Branches { get; set; }
 
