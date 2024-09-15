@@ -13,14 +13,19 @@ namespace ApiWeb.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }        
-        public string? UsuarioId { get; set; }
+        public string? Id { get; set; }
+        [Required]
+        public string UsuarioId { get; set; }
         [Required]
         public string Nombre { get; set; }
         [Required]                
-        public List<string> Tags { get; set; }                          
-        public string? Visibilidad { get; set; }      //Replace for enum. maybe   
+        public List<string> Tags { get; set; }
+        [Required]
+        [AllowedValues("public", "private")]
+        public string Visibilidad { get; set; }      //Replace for enum. maybe   
         public List<Branch>? Branches { get; set; }
+
+
 
 
         public void validateCreate()
@@ -30,19 +35,7 @@ namespace ApiWeb.Models
             {
                 Branches = [new Branch("Master", null)];
             }            
-        }
-
-        public void validatePublic()
-        {
-            Visibilidad = "public";
-            UsuarioId = null;
-        }
-
-        public void validatePrivate()
-        {
-            Visibilidad = "private";
-            if (UsuarioId == null) throw new Exception("usario_id cannot be null");
-        }
+        }        
                 
     }
 }

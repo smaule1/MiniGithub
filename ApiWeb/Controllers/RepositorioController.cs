@@ -3,6 +3,7 @@ using ApiWeb.Services;
 using Azure.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NuGet.Protocol.Core.Types;
 using System.Net;
@@ -22,63 +23,50 @@ namespace ApiWeb.Controllers
             this.repositorioDB = repositorioDB;
         }
 
+        //Assumption: Put methods can update any kind or repo (public or private), just by knowing the id.
+        //            The api assumes that just the logged user can get their own repos ids.
+
         //============== Public ====================
 
         //POST
-        [HttpPost("Publico")]
+        [HttpPost]
         public IActionResult PostPublic([FromBody] Repositorio repositorio) 
         {
 
             try
             {
-                repositorio.validateCreate();
-                repositorio.validatePublic();
+                repositorio.validateCreate();                
                 repositorioDB.Create(repositorio);
+
+                //TODO: If is a public repo, it needs a node in the graph for suscribes and likes
                 return Ok();
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest(new { error = "Duplicate Key Error", message = $"There is already a public repository named '{repositorio.Nombre}'" });
+                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
                 return BadRequest(ex.WriteError);
             }
         }
 
         //PUT
-        [HttpPut("Publico/{id}")]
-        public IActionResult PutPublic(string id, [FromBody] Repositorio repositorio)
+        [HttpPut("{id}")]
+        public IActionResult PutPublic(string id, [FromBody] Repositorio repositorio)  //TODO: Cambiar por atributos nombre y tags nada más
         {
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
             try
             {
-                repositorioDB.Update(repositorio, id);
+                var result = repositorioDB.Update(repositorio, id);
+                if(result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Repositorio not found"); }
                 return Ok();
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest(new { error = "Duplicate Key Error", message = $"There is already a public repository named '{repositorio.Nombre}'" });
+                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
                 return BadRequest(ex.WriteError);
             }
         }
-
-        //GET public repo by id
-        [HttpGet("Publico/byId/{id}")]
-        public IActionResult GetPublicById(string id)
-        {
-            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetPublicRepositorioById(id);
-
-            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
-        }
-
-        //GET public repo by name        
-        [HttpGet("Publico/byName/{name}")]
-        public IEnumerable<Repositorio> GetPublicByName(string name)
-        {
-            return repositorioDB.GetPublicRepositorioByName(name);
-        }
-
-        //TODO GET all public repos the user is suscribed, needs request to the graph database, Authentication// by user_id
 
         // DELETE 
         [HttpDelete("{id}")]
@@ -90,67 +78,55 @@ namespace ApiWeb.Controllers
         }
 
 
-        //===============  Private  =======================
-
-
-        //POST
-        [HttpPost("Private")]
-        public IActionResult PostPrivate([FromBody] Repositorio repositorio)
-        {
-
-            try
-            {
-                repositorio.validateCreate();
-                repositorio.validatePrivate();
-                repositorioDB.Create(repositorio);
-                return Ok();
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'" });
-                return BadRequest(ex.WriteError);
-            }catch (Exception ex) { return BadRequest(ex.Message); }
-
-        }
-
-        //PUT
-        [HttpPut("Private/{id}")]
-        public IActionResult PutPrivate(string id, [FromBody] Repositorio repositorio)
-        {
-            try
-            {
-                repositorioDB.Update(repositorio, id);
-                return Ok();
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'" });
-                return BadRequest(ex.WriteError);
-            }
-        }
-
-        //GET all private repos by user_id
-        [HttpGet("Private/{user_id}")]
-        public IEnumerable<Repositorio> GetAllPrivate(string user_id)
-        {
-            return repositorioDB.GetAllPrivateRepositorio(user_id);
-        }
-
-        //GET private repo by id & user_id
-        [HttpGet("Private/{user_id}/byId/{id}")]
-        public IActionResult GetPrivateById(string user_id, string id)
+        //GET public repo by id, returns full repo
+        [HttpGet("Publico/{id}")]
+        public IActionResult GetPublicById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetPrivateRepositorioById(user_id, id);
+            var repositorio = repositorioDB.GetPublicRepositorioById(id);
 
             return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
         }
 
-     
+        //GET public repo by name, returns simple repo      
+        [HttpGet("Publico/byName/{name}")]
+        public IActionResult GetPublicByName(string name)
+        {
+            return Ok(repositorioDB.GetPublicRepositorioByName(name));
+        }        
 
-        //TODO: CRUD BRANCH
+
+        //GET all private repos by user_id, returns simple repo
+        [HttpGet("Privado/All/{user_id}")]
+        public IActionResult GetAllPrivate(string user_id)
+        {
+            return Ok(repositorioDB.GetAllPrivateRepositorio(user_id));
+        }
+
+        //GET private repo by id & user_id, returns full repo
+        [HttpGet("Privado/{id}")]
+        public IActionResult GetPrivateById(string id)
+        {
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+            var repositorio = repositorioDB.GetPrivateRepositorioById(id);
+
+            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
+        }
+
+
+
+
+        //TODO: POST Branch - name must be unique, param(id_repo)
+        //TODO: PUT Branch name - name must be unique, param(id_repo, name)
+        //TODO: PUT Branch commit - param(id_repo, commit)
+        //TODO: DELETE Branch - param(id)
+
+
+
+
+
+
+
 
 
 

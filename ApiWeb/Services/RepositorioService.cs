@@ -15,12 +15,12 @@ namespace ApiWeb.Services
     {
         //Does database operations related with Repositorio model
 
-        public readonly IMongoDatabase db;
+        public readonly IMongoDatabase db;        
 
         public RepositorioService(IOptions<MongoDBSettings> options)
         {
             var client = new MongoClient(options.Value.ConnectionString);
-            db = client.GetDatabase(options.Value.DatabaseName);            
+            db = client.GetDatabase(options.Value.DatabaseName);                            
         }
 
 
@@ -60,35 +60,35 @@ namespace ApiWeb.Services
         {
             var builder = Builders<Repositorio>.Filter;
             var filter = builder.Eq(x => x.Visibilidad, "public") &  
-                         builder.Eq(x => x.Id, id);
-            
+                         builder.Eq(x => x.Id, id);            
             return repositorioCollection.Find(filter).FirstOrDefault();            
         }
 
-        public IEnumerable<Repositorio> GetPublicRepositorioByName(string name)
+        public List<Repositorio> GetPublicRepositorioByName(string name)
         {
             var builder = Builders<Repositorio>.Filter;
             var filter = builder.Regex(x => x.Nombre, $"/.*{name}.*/") &   //TODO: use Mongo's search index
                          builder.Eq(x => x.Visibilidad, "public");
-            return repositorioCollection.Find(filter).ToList();
+            var simpleRepo = Builders<Repositorio>.Projection.
+                 Expression(f => new Repositorio { Id=f.Id, UsuarioId = f.UsuarioId, Nombre = f.Nombre, Visibilidad=f.Visibilidad, Tags=f.Tags});
+            return repositorioCollection.Find(filter).Project(simpleRepo).ToList();
         }
 
-        public IEnumerable<Repositorio> GetAllPrivateRepositorio(string user_id)
+        public List<Repositorio> GetAllPrivateRepositorio(string user_id)
         {
             var builder = Builders<Repositorio>.Filter;
             var filter = builder.Eq(x => x.Visibilidad, "private") &
                          builder.Eq(x => x.UsuarioId, user_id);
-
-            return repositorioCollection.Find(filter).ToList();
+            var simpleRepo = Builders<Repositorio>.Projection.
+                Expression(f => new Repositorio { Id = f.Id, UsuarioId = f.UsuarioId, Nombre = f.Nombre, Visibilidad = f.Visibilidad, Tags = f.Tags });
+            return repositorioCollection.Find(filter).Project(simpleRepo).ToList();            
         }
 
-        public Repositorio GetPrivateRepositorioById(string user_id, string id)
+        public Repositorio GetPrivateRepositorioById(string id)
         {
             var builder = Builders<Repositorio>.Filter;
             var filter = builder.Eq(x => x.Visibilidad, "private") &
-                         builder.Eq(x => x.UsuarioId, user_id) &
-                         builder.Eq(x => x.Id, id);
-
+                         builder.Eq(x => x.Id, id);            
             return repositorioCollection.Find(filter).FirstOrDefault();
         }
     }
