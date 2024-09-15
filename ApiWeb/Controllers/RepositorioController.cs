@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NuGet.Protocol.Core.Types;
+using System.Data;
 using System.Net;
 
 
@@ -28,11 +29,11 @@ namespace ApiWeb.Controllers
         
 
 
-        //============ Repositories ====================================
+        //============ Repository ====================================
 
         //POST
         [HttpPost]
-        public IActionResult PostPublic([FromBody] Repositorio repositorio) 
+        public IActionResult Post([FromBody] Repositorio repositorio) 
         {
             try
             {
@@ -40,32 +41,32 @@ namespace ApiWeb.Controllers
                 repositorioDB.Create(repositorio);
 
                 //TODO: If is a public repo, it needs a node in the graph for suscribes and likes
-                return Ok();
+                return Created();
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
-                return BadRequest(ex.WriteError);
+                    return Conflict(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
+                return Conflict(ex.WriteError);
             }
         }
 
         //PUT
         [HttpPut("{id}")]
-        public IActionResult PutPublic(string id, [FromBody] Repositorio repositorio)  //TODO: Cambiar por atributos nombre y tags nada más
+        public IActionResult Put(string id, [FromBody] Repositorio repositorio)  //TODO: Cambiar por atributos nombre y tags nada más
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
             try
             {
                 var result = repositorioDB.Update(repositorio, id);
-                if(result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Repositorio not found"); }
-                return Ok();
+                if (result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Repositorio not found"); }
+                return Created();
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
-                return BadRequest(ex.WriteError);
+                    return Conflict(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
+                return Conflict(ex.WriteError);
             }
         }
 
@@ -84,7 +85,7 @@ namespace ApiWeb.Controllers
         public IActionResult GetPublicById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetPublicRepositorioById(id);
+            var repositorio = repositorioDB.GetRepositorioById(id, "public");
 
             return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
         }
@@ -115,15 +116,31 @@ namespace ApiWeb.Controllers
         public IActionResult GetPrivateById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetPrivateRepositorioById(id);
+            var repositorio = repositorioDB.GetRepositorioById(id, "private");
 
             return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
         }
 
 
+        // ====================== Branch ===================================
+
+        
+        //POST Branch
+        [HttpPost("{id}/branch")]
+        public IActionResult PostBranch(string id, [FromBody] Branch branch)
+        {
+            try
+            {
+                if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+                var result = repositorioDB.CreateBranch(id, branch);
+                if (result.IsAcknowledged && result.ModifiedCount == 0) { return Conflict("Creation failed"); }
+                return Created();
+            }
+            catch (BadHttpRequestException ex) { return BadRequest(ex.Message); }
+            catch (Exception ex) { return Conflict(ex.Message);}            
+        }
 
 
-        //TODO: POST Branch - name must be unique, param(id_repo)
         //TODO: PUT Branch name - name must be unique, param(id_repo, name)
         //TODO: PUT Branch commit - param(id_repo, commit)
         //TODO: DELETE Branch - param(id)
@@ -134,7 +151,8 @@ namespace ApiWeb.Controllers
 
 
 
-
+        //TODO: convert all routes to lowercase
+        //TODO: convert all text to english
 
 
 

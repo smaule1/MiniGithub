@@ -6,10 +6,11 @@ namespace ApiWeb.Models
     {
         [Required]
         public string Nombre { get; set; }        //Unique
+        [Required]
         public string? Latest_Commit { get; set; }
 
         public Branch(string nombre, string? latest_Commit)
-        {          
+        {
             Nombre = nombre;
             Latest_Commit = latest_Commit;
         }

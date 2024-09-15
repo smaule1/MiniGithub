@@ -37,5 +37,14 @@ namespace ApiWeb.Models
             }            
         }        
                 
+        public bool IsBranchNameAvailable(string name)
+        {
+            if (Branches.IsNullOrEmpty()) return true;             
+            foreach (var item in Branches)
+            {
+                if (item.Nombre == name) return false; 
+            }
+            return true;
+        }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OpenApi;
 using ApiWeb.Data;
 using static MongoDB.Driver.WriteConcern;
 using NuGet.Protocol.Core.Types;
+using System.Data;
 
 namespace ApiWeb.Services
 {
@@ -56,10 +57,10 @@ namespace ApiWeb.Services
             return repositorioCollection.DeleteOne(filter);                        
         }
 
-        public Repositorio GetPublicRepositorioById(string id)
+        public Repositorio GetRepositorioById(string id, string visibilidad)
         {
             var builder = Builders<Repositorio>.Filter;
-            var filter = builder.Eq(x => x.Visibilidad, "public") &  
+            var filter = builder.Eq(x => x.Visibilidad, visibilidad) &  
                          builder.Eq(x => x.Id, id);            
             return repositorioCollection.Find(filter).FirstOrDefault();            
         }
@@ -82,13 +83,23 @@ namespace ApiWeb.Services
             var simpleRepo = Builders<Repositorio>.Projection.
                 Expression(f => new Repositorio {Id = f.Id, UsuarioId = f.UsuarioId, Nombre = f.Nombre, Visibilidad = f.Visibilidad, Tags = f.Tags });
             return repositorioCollection.Find(filter).Project(simpleRepo).ToList();
-        }        
+        }                
 
-        public Repositorio GetPrivateRepositorioById(string id)
+        public UpdateResult CreateBranch(string id, Branch branch)
         {
-            var builder = Builders<Repositorio>.Filter;
-            var filter = builder.Eq(x => x.Visibilidad, "private") &
-                         builder.Eq(x => x.Id, id);            
+            var repositorio = GetRepositorioById(id) ?? throw new BadHttpRequestException("Repositorio not found");
+            if (!repositorio.IsBranchNameAvailable(branch.Nombre)) throw new DuplicateNameException($"There is already a branch named '{branch.Nombre}' in this repository");
+            
+            var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
+            var update = Builders<Repositorio>.Update.Push(x => x.Branches, branch);
+            
+            return repositorioCollection.UpdateOne(filter, update);
+
+        }
+
+        private Repositorio GetRepositorioById(string id)
+        {
+            var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
             return repositorioCollection.Find(filter).FirstOrDefault();
         }
     }
