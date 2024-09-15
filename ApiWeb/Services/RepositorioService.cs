@@ -42,8 +42,7 @@ namespace ApiWeb.Services
             {
                 var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
                 var update = Builders<Repositorio>.Update.Set(x => x.Nombre, repositorio.Nombre).
-                                                          Set(x => x.Tags, repositorio.Tags).
-                                                          Set(x => x.Visibilidad, repositorio.Visibilidad);
+                                                          Set(x => x.Tags, repositorio.Tags);
                 
                 return repositorioCollection.UpdateOne(filter, update);
             }

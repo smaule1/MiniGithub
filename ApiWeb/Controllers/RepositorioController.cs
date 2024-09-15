@@ -22,10 +22,47 @@ namespace ApiWeb.Controllers
             this.repositorioDB = repositorioDB;
         }
 
+        //============== Public ====================
 
+        //POST
+        [HttpPost("Publico")]
+        public IActionResult PostPublic([FromBody] Repositorio repositorio) 
+        {
+
+            try
+            {
+                repositorio.validateCreate();
+                repositorio.validatePublic();
+                repositorioDB.Create(repositorio);
+                return Ok();
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return BadRequest(new { error = "Duplicate Key Error", message = $"There is already a public repository named '{repositorio.Nombre}'" });
+                return BadRequest(ex.WriteError);
+            }
+        }
+
+        //PUT
+        [HttpPut("Publico/{id}")]
+        public IActionResult PutPublic(string id, [FromBody] Repositorio repositorio)
+        {
+            try
+            {
+                repositorioDB.Update(repositorio, id);
+                return Ok();
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return BadRequest(new { error = "Duplicate Key Error", message = $"There is already a public repository named '{repositorio.Nombre}'" });
+                return BadRequest(ex.WriteError);
+            }
+        }
 
         //GET public repo by id
-        [HttpGet("getPublic/byId/{id}")]
+        [HttpGet("Publico/byId/{id}")]
         public IActionResult GetPublicById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
@@ -35,75 +72,15 @@ namespace ApiWeb.Controllers
         }
 
         //GET public repo by name        
-        [HttpGet("getPublic/byName/{name}")]
+        [HttpGet("Publico/byName/{name}")]
         public IEnumerable<Repositorio> GetPublicByName(string name)
         {
             return repositorioDB.GetPublicRepositorioByName(name);
         }
 
+        //TODO GET all public repos the user is suscribed, needs request to the graph database, Authentication// by user_id
 
-        //TODO GET all public repos the user is suscribed, needs request to the graph database, Authentication
-
-        
-        //GET private repo by id
-        [HttpGet("getPrivate/{user_id}")]
-        public IEnumerable<Repositorio> GetAllPrivate(string user_id)
-        {
-            return repositorioDB.GetAllPrivateRepositorio(user_id);
-        }
-        
-        //GET private repos by id & user_id, Authentication         
-        [HttpGet("getPrivate/{user_id}/byId/{id}")]
-        public IActionResult GetPrivateById(string user_id, string id)
-        {
-            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetPrivateRepositorioById(user_id, id);
-            
-            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);                   
-        }
-
-
-
-
-
-        // POST api/<RepositorioController>
-        [HttpPost]
-        public IActionResult Post([FromBody] Repositorio repositorio)  //maybe change for attributes
-        {
-            //TODO: Authentication
-            try
-            {
-                repositorio.validateCreate();
-                repositorioDB.Create(repositorio);
-                return Ok();
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest("Duplicate Key Error: Combination of Nombre and UsuarioId already exists.");
-                return BadRequest(ex.WriteError);
-            }                        
-        }
-
-        // PUT api/<RepositorioController>/5
-        [HttpPut("{id}")]
-        public IActionResult Put(string id, [FromBody] Repositorio repositorio)
-        {
-            //TODO: Authentication
-            try
-            {
-                repositorioDB.Update(repositorio, id);
-                return Ok();
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return BadRequest("Duplicate Key Error: Combination of Nombre and UsuarioId already exists.");
-                return BadRequest(ex.WriteError);
-            }
-        }
-
-        // DELETE api/<RepositorioController>/5
+        // DELETE 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
@@ -113,7 +90,66 @@ namespace ApiWeb.Controllers
         }
 
 
-  
+        //===============  Private  =======================
+
+
+        //POST
+        [HttpPost("Private")]
+        public IActionResult PostPrivate([FromBody] Repositorio repositorio)
+        {
+
+            try
+            {
+                repositorio.validateCreate();
+                repositorio.validatePrivate();
+                repositorioDB.Create(repositorio);
+                return Ok();
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'" });
+                return BadRequest(ex.WriteError);
+            }catch (Exception ex) { return BadRequest(ex.Message); }
+
+        }
+
+        //PUT
+        [HttpPut("Private/{id}")]
+        public IActionResult PutPrivate(string id, [FromBody] Repositorio repositorio)
+        {
+            try
+            {
+                repositorioDB.Update(repositorio, id);
+                return Ok();
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return BadRequest(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'" });
+                return BadRequest(ex.WriteError);
+            }
+        }
+
+        //GET all private repos by user_id
+        [HttpGet("Private/{user_id}")]
+        public IEnumerable<Repositorio> GetAllPrivate(string user_id)
+        {
+            return repositorioDB.GetAllPrivateRepositorio(user_id);
+        }
+
+        //GET private repo by id & user_id
+        [HttpGet("Private/{user_id}/byId/{id}")]
+        public IActionResult GetPrivateById(string user_id, string id)
+        {
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+            var repositorio = repositorioDB.GetPrivateRepositorioById(user_id, id);
+
+            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
+        }
+
+     
+
         //TODO: CRUD BRANCH
 
 
