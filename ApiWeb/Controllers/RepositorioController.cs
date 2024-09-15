@@ -23,16 +23,17 @@ namespace ApiWeb.Controllers
             this.repositorioDB = repositorioDB;
         }
 
-        //Assumption: Put methods can update any kind or repo (public or private), just by knowing the id.
+        //Assumption: Methods can update any kind of repo (public or private), just by knowing the id.
         //            The api assumes that just the logged user can get their own repos ids.
+        
 
-        //============== Public ====================
+
+        //============ Repositories ====================================
 
         //POST
         [HttpPost]
         public IActionResult PostPublic([FromBody] Repositorio repositorio) 
         {
-
             try
             {
                 repositorio.validateCreate();                
@@ -93,14 +94,20 @@ namespace ApiWeb.Controllers
         public IActionResult GetPublicByName(string name)
         {
             return Ok(repositorioDB.GetPublicRepositorioByName(name));
-        }        
+        }
 
+        //GET all public repos by user_id, returns simple repo
+        [HttpGet("Publico/All/{user_id}")]
+        public IActionResult GetAllPublic(string user_id)
+        {
+            return Ok(repositorioDB.GetAllRepositorios(user_id, "public"));
+        }
 
         //GET all private repos by user_id, returns simple repo
         [HttpGet("Privado/All/{user_id}")]
         public IActionResult GetAllPrivate(string user_id)
         {
-            return Ok(repositorioDB.GetAllPrivateRepositorio(user_id));
+            return Ok(repositorioDB.GetAllRepositorios(user_id, "private"));
         }
 
         //GET private repo by id & user_id, returns full repo
@@ -121,6 +128,8 @@ namespace ApiWeb.Controllers
         //TODO: PUT Branch commit - param(id_repo, commit)
         //TODO: DELETE Branch - param(id)
 
+
+        //TODO: Make a private repo -> public 
 
 
 

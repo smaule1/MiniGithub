@@ -74,15 +74,15 @@ namespace ApiWeb.Services
             return repositorioCollection.Find(filter).Project(simpleRepo).ToList();
         }
 
-        public List<Repositorio> GetAllPrivateRepositorio(string user_id)
+        public List<Repositorio> GetAllRepositorios(string user_id, string visibilidad)
         {
             var builder = Builders<Repositorio>.Filter;
-            var filter = builder.Eq(x => x.Visibilidad, "private") &
+            var filter = builder.Eq(x => x.Visibilidad, visibilidad) &
                          builder.Eq(x => x.UsuarioId, user_id);
             var simpleRepo = Builders<Repositorio>.Projection.
-                Expression(f => new Repositorio { Id = f.Id, UsuarioId = f.UsuarioId, Nombre = f.Nombre, Visibilidad = f.Visibilidad, Tags = f.Tags });
-            return repositorioCollection.Find(filter).Project(simpleRepo).ToList();            
-        }
+                Expression(f => new Repositorio {Id = f.Id, UsuarioId = f.UsuarioId, Nombre = f.Nombre, Visibilidad = f.Visibilidad, Tags = f.Tags });
+            return repositorioCollection.Find(filter).Project(simpleRepo).ToList();
+        }        
 
         public Repositorio GetPrivateRepositorioById(string id)
         {
