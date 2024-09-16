@@ -9,6 +9,7 @@ using ApiWeb.Data;
 using static MongoDB.Driver.WriteConcern;
 using NuGet.Protocol.Core.Types;
 using System.Data;
+using MongoDB.Driver.Linq;
 
 namespace ApiWeb.Services
 {
@@ -101,6 +102,23 @@ namespace ApiWeb.Services
         {
             var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);
             return repositorioCollection.Find(filter).FirstOrDefault();
+        }
+
+        public UpdateResult UpdateBranchCommit(string id, string name, string commit)
+        {            
+            var builder = Builders<Repositorio>.Filter;
+            var filter = builder.Eq(x => x.Id, id) &
+                         builder.Where(x => x.Branches.Any(i => i.Nombre == name));
+            var update = Builders<Repositorio>.Update.Set(x => x.Branches.FirstMatchingElement().Latest_Commit, commit);
+            
+            return repositorioCollection.UpdateOne(filter, update);
+        }
+
+        public UpdateResult DeleteBranch(string id, string name)
+        {            
+            var filter = Builders<Repositorio>.Filter.Eq(x => x.Id, id);                         
+            var update = Builders<Repositorio>.Update.PullFilter(x => x.Branches, Builders<Branch>.Filter.Eq(x=>x.Nombre, name));
+            return repositorioCollection.UpdateOne(filter, update);
         }
     }
 }

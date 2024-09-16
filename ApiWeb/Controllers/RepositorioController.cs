@@ -60,7 +60,7 @@ namespace ApiWeb.Controllers
             {
                 var result = repositorioDB.Update(repositorio, id);
                 if (result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Repositorio not found"); }
-                return Created();
+                return Ok();
             }
             catch (MongoWriteException ex)
             {
@@ -140,11 +140,29 @@ namespace ApiWeb.Controllers
             catch (Exception ex) { return Conflict(ex.Message);}            
         }
 
+        
+        //PUT Branch commit
+        [HttpPut("{id}/branch/{name}")]
+        public IActionResult Put(string id, string name, [FromBody] string commit)  
+        {
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
+                        
+            var result = repositorioDB.UpdateBranchCommit(id, name, commit);
+            if (result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Combination of Repository and Name not found"); }
+            return Ok();                      
+        }
 
-        //TODO: PUT Branch name - name must be unique, param(id_repo, name)
-        //TODO: PUT Branch commit - param(id_repo, commit)
         //TODO: DELETE Branch - param(id)
+        // DELETE Branch
+        [HttpDelete("{id}/branch/{name}")]
+        public IActionResult DeleteBranch(string id, string name)
+        {
+            if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
 
+            var result = repositorioDB.DeleteBranch(id, name);
+            if (result.IsAcknowledged && result.ModifiedCount == 0) { return NotFound("Combination of Repository and Name not found"); }
+            return Ok();
+        }
 
         //TODO: Make a private repo -> public 
 
