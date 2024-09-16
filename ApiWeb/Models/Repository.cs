@@ -9,20 +9,20 @@ using System.Security.Cryptography;
 
 namespace ApiWeb.Models
 {
-    public class Repositorio
+    public class Repository
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
         [Required]
-        public string UsuarioId { get; set; }
+        public string UserId { get; set; }
         [Required]
-        public string Nombre { get; set; }
+        public string Name { get; set; }
         [Required]                
         public List<string> Tags { get; set; }
         [Required]
         [AllowedValues("public", "private")]
-        public string Visibilidad { get; set; }      //Replace for enum. maybe   
+        public string Visibility { get; set; }      //Replace for enum. maybe   
         public List<Branch>? Branches { get; set; }
 
 
@@ -42,7 +42,7 @@ namespace ApiWeb.Models
             if (Branches.IsNullOrEmpty()) return true;             
             foreach (var item in Branches)
             {
-                if (item.Nombre == name) return false; 
+                if (item.Name == name) return false; 
             }
             return true;
         }

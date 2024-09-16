@@ -8,6 +8,7 @@ using MongoDB.Driver;
 using NuGet.Protocol.Core.Types;
 using System.Data;
 using System.Net;
+using Repository = ApiWeb.Models.Repository;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,12 +17,12 @@ namespace ApiWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RepositorioController : ControllerBase
+    public class RepositororyController : ControllerBase
     {
-        private readonly RepositorioService repositorioDB;
-        public RepositorioController(RepositorioService repositorioDB)
+        private readonly RepositoryService repositoryDB;
+        public RepositororyController(RepositoryService repositoryDB)
         {
-            this.repositorioDB = repositorioDB;
+            this.repositoryDB = repositoryDB;
         }
 
         //Assumption: Methods can update any kind of repo (public or private), just by knowing the id.
@@ -33,12 +34,12 @@ namespace ApiWeb.Controllers
 
         //POST
         [HttpPost]
-        public IActionResult Post([FromBody] Repositorio repositorio) 
+        public IActionResult Post([FromBody] Repository repository) 
         {
             try
             {
-                repositorio.validateCreate();                
-                repositorioDB.Create(repositorio);
+                repository.validateCreate();                
+                repositoryDB.Create(repository);
 
                 //TODO: If is a public repo, it needs a node in the graph for suscribes and likes
                 return Created();
@@ -46,26 +47,26 @@ namespace ApiWeb.Controllers
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return Conflict(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
+                    return Conflict(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repository.Name}'"});
                 return Conflict(ex.WriteError);
             }
         }
 
         //PUT
         [HttpPut("{id}")]
-        public IActionResult Put(string id, [FromBody] Repositorio repositorio)  //TODO: Cambiar por atributos nombre y tags nada más
+        public IActionResult Put(string id, [FromBody] Repository repository)  //TODO: Cambiar por atributos nombre y tags nada más
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
             try
             {
-                var result = repositorioDB.Update(repositorio, id);
-                if (result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Repositorio not found"); }
+                var result = repositoryDB.Update(repository, id);
+                if (result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Repository not found"); }
                 return Ok();
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return Conflict(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repositorio.Nombre}'"});
+                    return Conflict(new { error = "Duplicate Key Error", message = $"You alreday have a repository named '{repository.Name}'"});
                 return Conflict(ex.WriteError);
             }
         }
@@ -76,7 +77,7 @@ namespace ApiWeb.Controllers
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
 
-            return Ok(repositorioDB.Delete(id));
+            return Ok(repositoryDB.Delete(id));
         }
 
 
@@ -85,30 +86,30 @@ namespace ApiWeb.Controllers
         public IActionResult GetPublicById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetRepositorioById(id, "public");
+            var repositorio = repositoryDB.GetRepositorioById(id, "public");
 
-            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
+            return (repositorio == null) ? NotFound("Repository not found") : Ok(repositorio);
         }
 
         //GET public repo by name, returns simple repo      
         [HttpGet("public/name/{name}")]
         public IActionResult GetPublicByName(string name)
         {
-            return Ok(repositorioDB.GetPublicRepositorioByName(name));
+            return Ok(repositoryDB.GetPublicRepositorioByName(name));
         }
 
         //GET all public repos by user_id, returns simple repo
         [HttpGet("public/all/{userId}")]
         public IActionResult GetAllPublic(string user_id)
         {
-            return Ok(repositorioDB.GetAllRepositorios(user_id, "public"));
+            return Ok(repositoryDB.GetAllRepositorios(user_id, "public"));
         }
 
         //GET all private repos by user_id, returns simple repo
         [HttpGet("Privado/All/{user_id}")]
         public IActionResult GetAllPrivate(string user_id)
         {
-            return Ok(repositorioDB.GetAllRepositorios(user_id, "private"));
+            return Ok(repositoryDB.GetAllRepositorios(user_id, "private"));
         }
 
         //GET private repo by id & user_id, returns full repo
@@ -116,9 +117,9 @@ namespace ApiWeb.Controllers
         public IActionResult GetPrivateById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-            var repositorio = repositorioDB.GetRepositorioById(id, "private");
+            var repositorio = repositoryDB.GetRepositorioById(id, "private");
 
-            return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
+            return (repositorio == null) ? NotFound("Repository not found") : Ok(repositorio);
         }
 
         //TODO: Make a private repo -> public , i think it is not part of the requirements       
@@ -133,7 +134,7 @@ namespace ApiWeb.Controllers
             try
             {
                 if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
-                var result = repositorioDB.CreateBranch(id, branch);
+                var result = repositoryDB.CreateBranch(id, branch);
                 if (result.IsAcknowledged && result.ModifiedCount == 0) { return Conflict("Creation failed"); }
                 return Created();
             }
@@ -147,7 +148,7 @@ namespace ApiWeb.Controllers
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
                         
-            var result = repositorioDB.UpdateBranchCommit(id, name, commit);
+            var result = repositoryDB.UpdateBranchCommit(id, name, commit);
             if (result.IsAcknowledged && result.MatchedCount == 0) { return NotFound("Combination of Repository and Name not found"); }
             return Ok();                      
         }
@@ -158,16 +159,10 @@ namespace ApiWeb.Controllers
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
 
-            var result = repositorioDB.DeleteBranch(id, name);
+            var result = repositoryDB.DeleteBranch(id, name);
             if (result.IsAcknowledged && result.ModifiedCount == 0) { return NotFound("Combination of Repository and Name not found"); }
             return Ok();
         }      
-
-
-        //TODO: convert all routes to lowercase
-        //TODO: convert all text to english
-
-
 
 
     }
