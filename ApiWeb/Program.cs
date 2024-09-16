@@ -28,7 +28,9 @@ builder.Services.Configure<MongoDBSettings>(
 builder.Configuration.GetSection("MongoDB"));
 
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
-builder.Services.AddSingleton<RepositorioService>();
+builder.Services.AddSingleton<RepositoryService>();
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
 

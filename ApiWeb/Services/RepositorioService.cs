@@ -24,10 +24,10 @@ namespace ApiWeb.Services
         }
 
 
-        public IMongoCollection<Repositorio> repositorioCollection =>
-            db.GetCollection<Repositorio>(collectionNames["Collection1"]);
+        public IMongoCollection<Repository> repositorioCollection =>
+            db.GetCollection<Repository>(collectionNames["Collection1"]);
 
-        public void Create(Repositorio repositorio)
+        public void Create(Repository repositorio)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace ApiWeb.Services
             catch (MongoWriteException) { throw; }                      
         }
 
-        public IEnumerable<Repositorio> getRepositorios()
+        public IEnumerable<Repository> getRepositorios()
         {
             return repositorioCollection.Find(a => true).ToList();
         }
