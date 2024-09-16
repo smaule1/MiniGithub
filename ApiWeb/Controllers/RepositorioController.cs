@@ -81,7 +81,7 @@ namespace ApiWeb.Controllers
 
 
         //GET public repo by id, returns full repo
-        [HttpGet("Publico/{id}")]
+        [HttpGet("public/{id}")]
         public IActionResult GetPublicById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
@@ -91,14 +91,14 @@ namespace ApiWeb.Controllers
         }
 
         //GET public repo by name, returns simple repo      
-        [HttpGet("Publico/byName/{name}")]
+        [HttpGet("public/name/{name}")]
         public IActionResult GetPublicByName(string name)
         {
             return Ok(repositorioDB.GetPublicRepositorioByName(name));
         }
 
         //GET all public repos by user_id, returns simple repo
-        [HttpGet("Publico/All/{user_id}")]
+        [HttpGet("public/all/{userId}")]
         public IActionResult GetAllPublic(string user_id)
         {
             return Ok(repositorioDB.GetAllRepositorios(user_id, "public"));
@@ -112,7 +112,7 @@ namespace ApiWeb.Controllers
         }
 
         //GET private repo by id & user_id, returns full repo
-        [HttpGet("Privado/{id}")]
+        [HttpGet("private/{id}")]
         public IActionResult GetPrivateById(string id)
         {
             if (!MongoDB.Bson.ObjectId.TryParse(id, out _)) return BadRequest($"'{id}' is not a valid id.");
@@ -121,10 +121,11 @@ namespace ApiWeb.Controllers
             return (repositorio == null) ? NotFound("Repositorio not found") : Ok(repositorio);
         }
 
+        //TODO: Make a private repo -> public , i think it is not part of the requirements       
 
         // ====================== Branch ===================================
 
-        
+
         //POST Branch
         [HttpPost("{id}/branch")]
         public IActionResult PostBranch(string id, [FromBody] Branch branch)
@@ -139,7 +140,6 @@ namespace ApiWeb.Controllers
             catch (BadHttpRequestException ex) { return BadRequest(ex.Message); }
             catch (Exception ex) { return Conflict(ex.Message);}            
         }
-
         
         //PUT Branch commit
         [HttpPut("{id}/branch/{name}")]
@@ -152,7 +152,6 @@ namespace ApiWeb.Controllers
             return Ok();                      
         }
 
-        //TODO: DELETE Branch - param(id)
         // DELETE Branch
         [HttpDelete("{id}/branch/{name}")]
         public IActionResult DeleteBranch(string id, string name)
@@ -162,11 +161,7 @@ namespace ApiWeb.Controllers
             var result = repositorioDB.DeleteBranch(id, name);
             if (result.IsAcknowledged && result.ModifiedCount == 0) { return NotFound("Combination of Repository and Name not found"); }
             return Ok();
-        }
-
-        //TODO: Make a private repo -> public 
-
-
+        }      
 
 
         //TODO: convert all routes to lowercase

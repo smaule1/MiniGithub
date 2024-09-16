@@ -30,6 +30,8 @@ builder.Services.Configure<MongoDBSettings>(
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
 builder.Services.AddSingleton<RepositorioService>();
 
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
