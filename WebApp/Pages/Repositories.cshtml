@@ -18,39 +18,15 @@
     <script src="~/js/pages/Repositories.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card mt-5 shadow-lg">
-                    <div class="card-header text-center bg-primary text-white">
-                        <h2>Repositorios</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="loginForm">
-                            <div class="mb-3">
-                                <label for="Email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="Email" placeholder="Ingresa tu correo electrónico" aria-describedby="emailHelp" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="Password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="Password" placeholder="Ingresa tu contraseña" required>
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">Recuérdame</label>
-                            </div>
-                            <div class="d-grid">
-                                <button type="button" id="btnIniciarSesion" class="btn btn-primary">Iniciar Sesión</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-footer text-center bg-light">
-                        <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>    
+    <div>
+        <table id="tableRepos">
+            <tr>
+                <th>Name</th>
+                <th>Visibility</th>
+                <th>Tags</th>
+            </tr>            
+        </table>
+    </div>
 </body>
 </html>
 

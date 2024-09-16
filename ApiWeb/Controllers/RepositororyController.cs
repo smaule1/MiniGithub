@@ -100,16 +100,16 @@ namespace ApiWeb.Controllers
 
         //GET all public repos by user_id, returns simple repo
         [HttpGet("public/all/{userId}")]
-        public IActionResult GetAllPublic(string user_id)
+        public IActionResult GetAllPublic(string userId)
         {
-            return Ok(repositoryDB.GetAllRepositorios(user_id, "public"));
+            return Ok(repositoryDB.GetAllRepositorios(userId, "public"));
         }
 
         //GET all private repos by user_id, returns simple repo
-        [HttpGet("Privado/All/{user_id}")]
-        public IActionResult GetAllPrivate(string user_id)
+        [HttpGet("Privado/All/{userId}")]
+        public IActionResult GetAllPrivate(string userId)
         {
-            return Ok(repositoryDB.GetAllRepositorios(user_id, "private"));
+            return Ok(repositoryDB.GetAllRepositorios(userId, "private"));
         }
 
         //GET private repo by id & user_id, returns full repo
