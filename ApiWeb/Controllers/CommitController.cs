@@ -15,8 +15,8 @@ namespace ApiWeb.Controllers
     [ApiController]
     public class CommitController : ControllerBase
     {
-        private readonly RepositorioService repositorioDB;
-        public CommitController(RepositorioService repositorioDB)
+        private readonly RepositoryService repositorioDB;
+        public CommitController(RepositoryService repositorioDB)
         {
             this.repositorioDB = repositorioDB;
         }
@@ -25,7 +25,7 @@ namespace ApiWeb.Controllers
         [Route("RetrieveAll")]
         public IEnumerable<Commit> Get()
         {
-            return repositorioDB.getCommits();
+            return repositorioDB.getAllCommits();
         }
 
         [HttpPost]

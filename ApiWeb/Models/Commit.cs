@@ -10,8 +10,12 @@ namespace ApiWeb.Models
 {
     public class Commit
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+
         [Required]
-        public string RepositoryName { get; set; }
+        public string RepoName { get; set; }
 
         [Required]
         public string BranchName { get; set; }
@@ -19,11 +23,15 @@ namespace ApiWeb.Models
         [Required]
         public int Version { get; set; }
 
-        public Commit(string repositoryName, string branchName, int version)
+        [Required]
+        public string Message { get; set; }
+
+        public Commit(string repositoryName, string branchName, int version, string message)
         {
-            RepositoryName = repositoryName;
+            RepoName = repositoryName;
             BranchName = branchName;
             Version = version;
+            Message = message;
         }
 
         //Aún falta lo de los archivos

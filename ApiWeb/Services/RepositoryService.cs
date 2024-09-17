@@ -18,17 +18,19 @@ namespace ApiWeb.Services
     {
         //Does database operations related with Repositorio model
 
-        public readonly IMongoDatabase db;        
+        public readonly IMongoDatabase db;
+        private readonly IDictionary<string, string> collectionNames;
 
         public RepositoryService(IOptions<MongoDBSettings> options)
         {
             var client = new MongoClient(options.Value.ConnectionString);
-            db = client.GetDatabase(options.Value.DatabaseName);                            
+            db = client.GetDatabase(options.Value.DatabaseName);
+            collectionNames = options.Value.Collections;
         }
 
 
         public IMongoCollection<Repository> repositoryCollection =>
-            db.GetCollection<Repository>("repositories");
+            db.GetCollection<Repository>(collectionNames["Collection1"]);
 
         public void Create(Repository repository)
         {            
@@ -79,7 +81,7 @@ namespace ApiWeb.Services
 
         public List<Repository> GetAllRepositorios(string user_id, string visibilidad)
         {
-            var builder = Builders< Repository>.Filter;
+            var builder = Builders<Repository>.Filter;
             var filter = builder.Eq(x => x.Visibility, visibilidad) &
                          builder.Eq(x => x.UserId, user_id);
             var simpleRepo = Builders<Repository>.Projection.
@@ -120,6 +122,28 @@ namespace ApiWeb.Services
             var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);                         
             var update = Builders<Repository>.Update.PullFilter(x => x.Branches, Builders<Branch>.Filter.Eq(x => x.Name, name));
             return repositoryCollection.UpdateOne(filter, update);
+        }
+
+        //Methods used to commit
+        //Methods were added in this same file, so
+        //another MongoClient isn't needed
+
+        public IMongoCollection<Commit> commitCollection =>
+             db.GetCollection<Commit>(collectionNames["Collection2"]);
+
+
+        public IEnumerable<Commit> getAllCommits()
+        {   
+            return commitCollection.Find(a => true).ToList();
+        }
+
+        public void CreateCommit(Commit commit)
+        {
+            try
+            {
+                commitCollection.InsertOne(commit);
+            }
+            catch (MongoWriteException) { throw; }
         }
     }
 }
