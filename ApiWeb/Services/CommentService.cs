@@ -51,7 +51,7 @@ namespace ApiWeb.Services
 
         public List<Comment> GetComments()
         {
-            List<Comment> list = new List<Comment>();
+            List<Comment> list = [];
             var comments = _session.Execute("SELECT * FROM comments;");
             
             foreach (var row in comments)
@@ -61,7 +61,7 @@ namespace ApiWeb.Services
                 string message = (string) row["message"];
                 DateTimeOffset date = (DateTimeOffset) row["last_date"];
                 List<Subcomment> subcomments = GetSubcomments((Subcomment[]) row["subcomments"]);
-                Comment comment = new Comment(id, user, message, date, subcomments);
+                Comment comment = new(id, user, message, date, subcomments);
                 list.Add(comment);
             }
 
