@@ -23,10 +23,26 @@ namespace ApiWeb.Controllers
 
         [HttpGet]
         [Route("RetrieveAll")]
-        public IEnumerable<Commit> Get()
+        public ActionResult RetrieveAll(string currentBranch)
         {
-            return repositorioDB.getAllCommits();
+            return Ok(repositorioDB.getAllCommits(currentBranch)); 
         }
+
+        [HttpGet]
+        public ActionResult RetrieveByContentId(int contenidoId)
+        {
+            try
+            {
+                var reviewManager = new ReviewManager();
+                var result = reviewManager.RetrieveByContentId(contenidoId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [HttpPost]
         [Route("Create")]

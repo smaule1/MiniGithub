@@ -132,9 +132,12 @@ namespace ApiWeb.Services
              db.GetCollection<Commit>(collectionNames["Collection2"]);
 
 
-        public IEnumerable<Commit> getAllCommits()
-        {   
-            return commitCollection.Find(a => true).ToList();
+        public IEnumerable<Commit> getAllCommits(string currentBranch)
+        {
+            var builder = Builders<Commit>.Filter;
+            var filter = builder.Eq(x => x.BranchName, currentBranch);
+            return commitCollection.Find(filter).ToList();
+
         }
 
         public void CreateCommit(Commit commit)

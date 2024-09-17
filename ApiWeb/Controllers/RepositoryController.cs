@@ -17,10 +17,10 @@ namespace ApiWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RepositororyController : ControllerBase
+    public class RepositoryController : ControllerBase
     {
         private readonly RepositoryService repositoryDB;
-        public RepositororyController(RepositoryService repositoryDB)
+        public RepositoryController(RepositoryService repositoryDB)
         {
             this.repositoryDB = repositoryDB;
         }

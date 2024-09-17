@@ -1,6 +1,10 @@
-﻿function commitController() {
+﻿function changeDropdown(text) {
+    document.getElementById('dropdownButton').innerHTML = text;
+    commitController(text);
+}
+function commitController(branch) {
     var ca = new ControlActions();
-    var urlService = ca.GetUrlApiService("commit/retrieveall");
+    var urlService = ca.GetUrlApiService("commit/retrieveall?currentBranch=" + branch);
 
     $.ajax({
         url: urlService,
@@ -28,7 +32,7 @@
 }
 
 $(document).ready(function () {
-    commitController();
+    commitController("Master");
 
     /*
     var usuario = sessionStorage.getItem("Usuario");
