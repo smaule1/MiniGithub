@@ -66,6 +66,25 @@ namespace ApiWeb.Controllers
             return userComments;
         }
 
+        // GET: api/<CommentController>/GetAll
+        [HttpGet]
+        [Route("GetByRepoId")]
+        public IEnumerable<Comment> GetByRepoId(string repoId)
+        {
+            List<Comment> comments = _commentService.GetComments();
+            List<Comment> repoComments = [];
+
+            foreach (Comment comment in comments)
+            {
+                if (repoId.Equals(comment.RepoId))
+                {
+                    repoComments.Add(comment);
+                }
+            }
+
+            return repoComments;
+        }
+
         // POST api/<CommentController>/InsertComment
         [HttpPost]
         [Route("InsertComment")]
@@ -86,14 +105,11 @@ namespace ApiWeb.Controllers
         // PUT api/<CommentController>/UpdateComment/5
         [HttpPut]
         [Route("UpdateComment")]
-        public IActionResult UpdateComment(Guid id, [FromBody] Comment comment)
+        public IActionResult UpdateComment([FromBody] Comment comment)
         {
             try
             {
-                if (comment.Id == id)
-                {
-                    _commentService.UpdateComment(comment);
-                }
+                _commentService.UpdateComment(comment);
                 return Ok();
             }
             catch (Exception e)
@@ -128,16 +144,7 @@ namespace ApiWeb.Controllers
             try
             {
                 Comment comment = _commentService.GetComment(idComment);
-                List<Subcomment> subcomments = comment.Subcomments;
-                if (subcomments != null)
-                {
-                    subcomments.Add(subcomment);
-                }
-                else
-                {
-                    subcomments = new List<Subcomment>([subcomment]);
-                }
-                comment.Subcomments = subcomments;
+                comment.Subcomments.Add(subcomment);
                 _commentService.UpdateComment(comment);
                 return Ok();
             }
@@ -151,14 +158,17 @@ namespace ApiWeb.Controllers
         // DELETE api/<CommentController>/UpdateSubcomment/5
         [HttpPut]
         [Route("UpdateSubcomment")]
-        public IActionResult Subcomment(Guid idComment, string message, DateTimeOffset date, [FromBody] Subcomment antSubcomment)
+        public IActionResult Subcomment(Guid idComment, string message, DateTimeOffset last_date, [FromBody] Subcomment antSubcomment)
         {
             try
             {
                 Comment comment = _commentService.GetComment(idComment);
-                Subcomment subcomment = new(antSubcomment.User, message, date);
-                comment.Subcomments.Remove(antSubcomment);
-                comment.Subcomments.Add(subcomment);
+                Subcomment? subcomment = comment.Subcomments!.Find(s => s.Equals(antSubcomment));
+                if (subcomment != null)
+                {
+                    subcomment.Message = message;
+                    subcomment.LastDate = last_date;
+                }
                 _commentService.UpdateComment(comment);
                 return Ok();
             }

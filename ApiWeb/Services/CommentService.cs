@@ -3,6 +3,7 @@ using ApiWeb.Models;
 using Cassandra;
 using DTOs;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -14,6 +15,8 @@ namespace ApiWeb.Services
         private readonly Cluster _cluster;
         [Required]
         private readonly Cassandra.ISession _session;
+        const string colId = "id", colUser = "user", colMessage = "message", colCreationDate = "creation_date",
+            colLastDate = "last_date", colSubcomments = "subcomments", colRepoId = "repo_id";
         
         public CommentService (IOptions<CassandraSettings> options)
         {
@@ -24,51 +27,14 @@ namespace ApiWeb.Services
 
             _session.UserDefinedTypes.Define(
                 UdtMap.For<Subcomment>("subcomment")
-                    .Map(c => c.User, "user")
-                    .Map(c => c.Message, "message")
-                    .Map(c => c.LastDate, "last_date")
+                    .Map(c => c.User, colUser)
+                    .Map(c => c.Message, colMessage)
+                    .Map(c => c.CreationDate, colCreationDate)
+                    .Map(c => c.LastDate, colLastDate)
             );
         }
 
-        public void CreateComment(Comment comment)
-        {
-            Guid id = comment.Id;
-            string user = comment.User;
-            string message = comment.Message;
-            DateTimeOffset date = comment.LastDate;
-            List<Subcomment> subcomments = comment.Subcomments;
-
-            if (GetComment(id) != null)
-            {
-                throw new Exception("Primary Key Duplicated");
-            }
-
-            string query = "INSERT INTO comments (id, user, message, last_date, subcomments) VALUES (?, ?, ?, ?, ?);";
-            var statement = _session.Prepare(query);
-            var boundStatement = statement.Bind(id, user, message, date, subcomments);
-            _session.Execute(boundStatement);
-        }
-
-        public List<Comment> GetComments()
-        {
-            List<Comment> list = [];
-            var comments = _session.Execute("SELECT * FROM comments;");
-            
-            foreach (var row in comments)
-            {
-                Guid id = (Guid) row["id"];
-                string user = (string) row["user"];
-                string message = (string) row["message"];
-                DateTimeOffset date = (DateTimeOffset) row["last_date"];
-                List<Subcomment> subcomments = GetSubcomments((Subcomment[]) row["subcomments"]);
-                Comment comment = new(id, user, message, date, subcomments);
-                list.Add(comment);
-            }
-
-            return list;
-        }
-
-        private List<Subcomment> GetSubcomments(Subcomment[] array)
+        private static List<Subcomment> GetSubcomments(Subcomment[] array)
         {
             if (array == null || array.Length == 0)
             {
@@ -78,6 +44,28 @@ namespace ApiWeb.Services
             {
                 return [.. array];
             }
+        }
+
+        public List<Comment> GetComments()
+        {
+            List<Comment> list = [];
+            var comments = _session.Execute("SELECT * FROM comments;");
+            
+            foreach (var row in comments)
+            {
+                Guid id = (Guid) row[colId];
+                string user = (string) row[colUser];
+                string message = (string) row[colMessage];
+                DateTimeOffset creationDate = (DateTimeOffset)row[colCreationDate];
+                DateTimeOffset lastDate = (DateTimeOffset) row[colLastDate];
+                List<Subcomment> subcomments = GetSubcomments((Subcomment[]) row[colSubcomments]);
+                if (!subcomments.IsNullOrEmpty()) { subcomments.Sort((s1, s2) => s1.CreationDate.CompareTo(s2.CreationDate)); }
+                string repoId = (string)row[colRepoId];
+                Comment comment = new(id, user, message, creationDate, lastDate, subcomments, repoId);
+                list.Add(comment);
+            }
+
+            return list;
         }
 
         public Comment GetComment(Guid id)
@@ -93,23 +81,59 @@ namespace ApiWeb.Services
             return null!;
         }
 
+        public void CreateComment(Comment comment)
+        {
+            Guid id = comment.Id;
+            string user = comment.User;
+            string message = comment.Message;
+            string repoId = comment.RepoId;
+            DateTimeOffset creationDate = comment.CreationDate;
+            List<Subcomment> subcomments = comment.Subcomments;
+
+            if (GetComment(id) != null)
+            {
+                throw new Exception("Primary Key Duplicated");
+            }
+
+            try
+            {
+                string query = $"INSERT INTO comments ({colId}, {colUser}, {colMessage}, {colCreationDate}, {colLastDate}, {colSubcomments}, {colRepoId}) VALUES (?, ?, ?, ?, ?, ?, ?);";
+                var statement = _session.Prepare(query);
+                var boundStatement = statement.Bind(id, user, message, creationDate, creationDate, subcomments, repoId);
+                _session.Execute(boundStatement);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in CommentService.CreateComment\n" + e.Message);
+            }
+        }
+
         public void UpdateComment(Comment comment)
         {
             Guid id = comment.Id;
             string user = comment.User;
             string message = comment.Message;
-            DateTimeOffset date = comment.LastDate;
+            string repoId = comment.RepoId;
+            DateTimeOffset lastDate = comment.LastDate;
             List<Subcomment> subcomments = comment.Subcomments;
+            if (!subcomments.IsNullOrEmpty()) { subcomments.Sort((s1, s2) => s1.CreationDate.CompareTo(s2.CreationDate)); }
 
             if (GetComment(id) == null)
             {
                 throw new Exception("Object does not exist");
             }
 
-            string query = "UPDATE comments SET user = ?, message = ?, last_date = ?, subcomments = ? WHERE id = ?;";
-            var statement = _session.Prepare(query);
-            var boundStatement = statement.Bind(user, message, date, subcomments, id);
-            _session.Execute(boundStatement);
+            try
+            {
+                string query = $"UPDATE comments SET {colUser} = ?, {colMessage} = ?, {colLastDate} = ?, {colSubcomments} = ?, {colRepoId} = ? WHERE {colId} = ?;";
+                var statement = _session.Prepare(query);
+                var boundStatement = statement.Bind(user, message, lastDate, subcomments, repoId, id);
+                _session.Execute(boundStatement);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in CommentService.UpdateComment\n" + e.Message);
+            }
         }
 
         public void DeleteComment(Guid id)
@@ -119,10 +143,17 @@ namespace ApiWeb.Services
                 throw new Exception("Object does not exist");
             }
 
-            string query = "DELETE FROM comments WHERE id = ?;";
-            var statement = _session.Prepare(query);
-            var boundStatement = statement.Bind(id);
-            _session.Execute(boundStatement);
+            try
+            {
+                string query = $"DELETE FROM comments WHERE {colId} = ?;";
+                var statement = _session.Prepare(query);
+                var boundStatement = statement.Bind(id);
+                _session.Execute(boundStatement);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in CommentService.DeleteComment\n" + e.Message);
+            }
         }
 
         public string GetExceptionMessage(Exception exception)
