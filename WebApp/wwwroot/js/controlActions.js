@@ -68,7 +68,7 @@ function ControlActions() {
             dataType: "json",
             success: function (data) {
                 if (callBackFunction) {
-                    Swal.fire('Good job!', 'Transaction completed!', 'success');
+                    Swal.fire('Completado!', 'Transaction completed!');
                     callBackFunction(data);
                 }
             },
@@ -98,7 +98,7 @@ function ControlActions() {
 
     this.PutToAPI = function (service, data, callBackFunction) {
         $.put(this.GetUrlApiService(service), data, function (response) {
-            Swal.fire('Good job!', 'Transaction completed!', 'success');
+            Swal.fire('Completado!', 'Transaction completed!');
             if (callBackFunction) {
                 callBackFunction(response);
             }
@@ -122,7 +122,7 @@ function ControlActions() {
 
     this.DeleteToAPI = function (service, data, callBackFunction) {
         $.delete(this.GetUrlApiService(service), data, function (response) {
-            Swal.fire('Good job!', 'Transaction completed!', 'success');
+            Swal.fire('Completado!', 'Transaction completed!');
             if (callBackFunction) {
                 callBackFunction(response);
             }

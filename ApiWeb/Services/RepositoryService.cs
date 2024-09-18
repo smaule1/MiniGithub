@@ -140,7 +140,15 @@ namespace ApiWeb.Services
 
         }
 
-        public void CreateCommit(Commit commit)
+        public Commit getCommitById(string commitId)
+        {
+            var builder = Builders<Commit>.Filter;
+            var filter = builder.Eq(x => x.Id, commitId);
+            return commitCollection.Find(filter).FirstOrDefault();
+
+        }
+
+        public void createCommit(Commit commit)
         {
             try
             {

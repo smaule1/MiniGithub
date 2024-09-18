@@ -3,7 +3,9 @@ using ApiWeb.Services;
 using CoreApp;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using System;
 using System.Net;
 
 
@@ -29,6 +31,7 @@ namespace ApiWeb.Controllers
         }
 
         [HttpGet]
+        [Route("RetrieveById")]
         public ActionResult RetrieveByContentId(int contenidoId)
         {
             try
@@ -50,8 +53,9 @@ namespace ApiWeb.Controllers
         {
             try
             {
-                repositorioDB.CreateCommit(commit);
-                return Ok();
+                repositorioDB.createCommit(commit);
+                return Created();
+
             }
             catch (MongoWriteException ex)
             {

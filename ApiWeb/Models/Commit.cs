@@ -23,17 +23,10 @@ namespace ApiWeb.Models
         [Required]
         public int Version { get; set; }
 
-        [Required]
-        public string Message { get; set; }
-
-        public Commit(string repositoryName, string branchName, int version, string message)
-        {
-            RepoName = repositoryName;
-            BranchName = branchName;
-            Version = version;
-            Message = message;
-        }
+        public string? Message { get; set; }
 
         //Aún falta lo de los archivos
+
+
     }
 }

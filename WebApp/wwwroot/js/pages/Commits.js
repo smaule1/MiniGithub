@@ -1,10 +1,50 @@
-﻿function changeDropdown(text) {
+﻿sessionStorage.setItem("Branch", "Master");
+
+function changeDropdown(text) {
+    //Se mete la branch actual dentro del storage local
+    sessionStorage.setItem("Branch", text);
+
     document.getElementById('dropdownButton').innerHTML = text;
-    commitController(text);
+
+    commitController();
 }
-function commitController(branch) {
+
+//Listens the "click" event to create a Commit
+function createCommit() {
+    $("#acceptModalButton").click(() => {
+        registrarCommit();
+    });
+}
+
+//This function create a commit
+function registrarCommit() {
+    //Necesita traer elementos guardados en el SessionStorage
+    var message = $("#commitMsg").val();
+    var contenido = {
+        RepoName: "MiniGithub",
+        BranchName: sessionStorage.getItem("Branch"),
+        Version: 1,
+        Message: message
+    };
+    console.log(contenido);
+
     var ca = new ControlActions();
-    var urlService = ca.GetUrlApiService("commit/retrieveall?currentBranch=" + branch);
+    var service = "commit/create";
+
+    ca.PostToAPI(service, contenido, () => {
+        console.log("Contenido registrado!");
+
+    });
+    const commitList = $("#commitList");
+    var listElement = `<a href="#" class="list-group-item list-group-item-action">${message}</a>`;
+    commitList.append(listElement);
+}
+
+//This function fetchs data from Mongo
+function commitController() {
+    var currentBranch = sessionStorage.getItem("Branch");
+    var ca = new ControlActions();
+    var urlService = ca.GetUrlApiService("commit/retrieveall?currentBranch=" + currentBranch);
 
     $.ajax({
         url: urlService,
@@ -33,6 +73,7 @@ function commitController(branch) {
 
 $(document).ready(function () {
     commitController("Master");
+    var commitCreator = new createCommit();
 
     /*
     var usuario = sessionStorage.getItem("Usuario");
