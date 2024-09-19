@@ -19,24 +19,31 @@ function createCommit() {
 //This function create a commit
 function registrarCommit() {
     //Necesita traer elementos guardados en el SessionStorage
+
+    var formData = new FormData(); // Crear un objeto FormData
+
     var message = $("#commitMsg").val();
-    var contenido = {
-        RepoName: "MiniGithub",
-        BranchName: sessionStorage.getItem("Branch"),
-        Version: 1,
-        Message: message
-    };
-    console.log(contenido);
+    var file = document.getElementById('file').files[0];
+
+    formData.append('repoName', "MiniGithub");
+    formData.append('branchName', sessionStorage.getItem("Branch"));
+    formData.append('version', 10);
+    formData.append('message', message);
+    formData.append('file', file);
 
     var ca = new ControlActions();
     var service = "commit/create";
 
-    ca.PostToAPI(service, contenido, () => {
+    ca.PostToAPICommit(service, formData, () => {
         console.log("Contenido registrado!");
 
+        // Redirige a la p�gina de "Contenido" despu�s de registrar el contenido
+        // Cambia "Contenido" a la ruta correcta de tu p�gina de contenido
     });
+
     const commitList = $("#commitList");
     var listElement = `<a href="#" class="list-group-item list-group-item-action">${message}</a>`;
+
     commitList.append(listElement);
 }
 
