@@ -16,7 +16,16 @@ builder.Services.AddCors(options =>
                       });
 });
 
-// Resto de configuración de servicios
+//Configuracion de la Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Resto de configuracion de servicios
 builder.Services.AddRazorPages(o =>
 {
     o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
@@ -24,7 +33,7 @@ builder.Services.AddRazorPages(o =>
 
 var app = builder.Build();
 
-// Configuración de la canalización de solicitudes HTTP
+// Configuracion de la canalizacion de solicitudes HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -41,6 +50,8 @@ app.UseCors("MyAllowSpecificOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.UseEndpoints(endpoints =>
 {

@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace WebApp.Pages
+namespace WebApp.Pages.Shared
 {
-    public class RepositoriesModel : PageModel
+    public class _UserLayoutModel : PageModel
     {
         public void OnGet()
         {
-            HttpContext.Session.SetString("_User", "samuel");
         }
     }
 }
