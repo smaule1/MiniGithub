@@ -23,7 +23,6 @@ async function getData() {
 }
 
 
-
 function displayRepository(value) {
     const table = $("#tableBodyRepo");
     var row = `

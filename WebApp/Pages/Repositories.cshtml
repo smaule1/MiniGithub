@@ -1,6 +1,5 @@
 ﻿@page
 @model WebApp.Pages.RepositoriesModel
-@using Microsoft.AspNetCore.Http
 @{
     Layout = "_Layout";
 }
@@ -27,8 +26,6 @@
             </tbody>
         </table>
     </div>    
-    <h1>@HttpContext.Session.GetString("_User")</h1>
 </body>
-    
 </html>
 

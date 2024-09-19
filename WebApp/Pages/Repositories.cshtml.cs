@@ -7,7 +7,6 @@ namespace WebApp.Pages
     {
         public void OnGet()
         {
-            HttpContext.Session.SetString("_User", "samuel");
         }
     }
 }
