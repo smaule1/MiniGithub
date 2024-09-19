@@ -41,7 +41,7 @@ async function search(name) {
 function displayRepository(value) {
     var row = `
         <tr>
-            <th> <a href="/Repository?id=${value.id}"> ${value.name} </a> </th>
+            <th> <a href="/PublicRepository?id=${value.id}"> ${value.name} </a> </th>
             <td>${value.visibility} </td>
             <td>${value.tags}</td>
         </tr>
