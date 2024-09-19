@@ -12,11 +12,11 @@ builder.Services.AddCors(options =>
                       {
                           policy.WithOrigins("https://localhost:7269") // URL de la API
                                 .AllowAnyHeader()
-                                .AllowAnyMethod();
+                                .AllowAnyMethod().AllowAnyOrigin();
                       });
 });
 
-// Resto de configuración de servicios
+// Resto de configuraciï¿½n de servicios
 builder.Services.AddRazorPages(o =>
 {
     o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
@@ -24,7 +24,7 @@ builder.Services.AddRazorPages(o =>
 
 var app = builder.Build();
 
-// Configuración de la canalización de solicitudes HTTP
+// Configuraciï¿½n de la canalizaciï¿½n de solicitudes HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
