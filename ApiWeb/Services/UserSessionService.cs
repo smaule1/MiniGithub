@@ -37,13 +37,13 @@ namespace ApiWeb.Services
 
                 if(user != null)
                 {
-                    if(user.Password == User.HashPassword(email, password))
+                    if(user.Password == User.HashPassword(password, email))
                     {
                         UserSession session = new UserSession(user.Email, user.Name, user.Id);
                         string sessionString = JsonSerializer.Serialize(session);
 
                         db.StringSet("session:" + session.SessionId, sessionString);
-                        db.KeyExpire("session:" + session.SessionId, TimeSpan.FromHours(3));
+                        db.KeyExpire("session:" + session.SessionId, TimeSpan.FromHours(1));
 
                         return session.SessionId;
                     } else
@@ -66,7 +66,7 @@ namespace ApiWeb.Services
 
             if(db.KeyExists("session:" + sessionId))
             {
-                db.KeyExpire("session:" + sessionId, TimeSpan.FromHours(3));
+                db.KeyExpire("session:" + sessionId, TimeSpan.FromHours(1));
 
                 return true;
             } else

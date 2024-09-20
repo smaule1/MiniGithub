@@ -46,15 +46,34 @@ namespace ApiWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get(string sessionId)
+        public IActionResult Get()
         {
-            if (sessionDb.VerifySession(sessionId))
+            try
             {
-                return Ok();
-            } else
-            {
-                return Unauthorized("Current session is not valid or is expired.");
+                string? sessionId = Request.Cookies["SessionId"];
+
+                if (sessionId != null)
+                {
+                    if (sessionDb.VerifySession(sessionId))
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return Unauthorized("Current session is not valid or is expired.");
+                    }
+                }
+                else
+                {
+                    return Unauthorized("Current session is invalid.");
+                }
+
             }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpDelete]
