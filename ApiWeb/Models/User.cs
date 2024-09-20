@@ -1,13 +1,7 @@
-﻿using StackExchange.Redis;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.IdentityModel.Tokens;
-using System.Runtime.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Runtime.CompilerServices;
-
 
 namespace ApiWeb.Models
 {
@@ -38,7 +32,6 @@ namespace ApiWeb.Models
                 output.Append(hash[i].ToString("X2"));
             }
 
-            Console.WriteLine(output.ToString());
             return output.ToString();
         }
 

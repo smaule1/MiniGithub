@@ -1,13 +1,7 @@
 ﻿using StackExchange.Redis;
-using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.IdentityModel.Tokens;
-using System.Runtime.Serialization;
 using ApiWeb.Models;
 using System.Text.Json;
-using MongoDB.Bson.Serialization.IdGenerators;
-using NuGet.Versioning;
-using Amazon.Runtime.Internal.Transform;
 
 namespace ApiWeb.Services
 {
@@ -29,6 +23,21 @@ namespace ApiWeb.Services
             _lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
                 ConnectionMultiplexer.Connect("localhost")
             );
+        }
+
+        private bool isValidEmail(string e)
+        {
+            return true;
+        }
+
+        private bool isValidPassword(string p)
+        {
+            return true;
+        }
+
+        private bool isValidName(string n)
+        {
+            return true;
         }
 
         public IEnumerable<User?> GetUsers()
@@ -58,12 +67,24 @@ namespace ApiWeb.Services
             {
                 throw new InvalidOperationException("An user with this email already exists.");
             }
+            if (!isValidEmail(email))
+            {
+                throw new ValidationException("Email is not valid.");
+            }
+            if (!isValidPassword(password))
+            {
+                throw new ValidationException("Password must meet the minimum requirements.");
+            }
+            if (!isValidName(name))
+            {
+                throw new ValidationException("Name is not valid.");
+            }
 
             if (password != string.Empty && name != string.Empty && email != string.Empty)
             {
                 User user = new User(email, password, name);
                 string userString = JsonSerializer.Serialize(user);
-                db.StringSet(user.Email, userString);
+                db.StringSet("user:" + user.Email, userString);
             } else
             {
                 throw new InvalidOperationException("At least one required field is empty.");
@@ -72,9 +93,14 @@ namespace ApiWeb.Services
 
         public User? GetUser(string email)
         {
+            if (!isValidEmail(email))
+            {
+                throw new ValidationException("Email is not valid.");
+            }
+
             var db = Connection.GetDatabase();
 
-            string? userString = db.StringGet(email);
+            string? userString = db.StringGet("user:" + email);
 
             if (userString == null)
             {
@@ -88,10 +114,21 @@ namespace ApiWeb.Services
         {
             var db = Connection.GetDatabase();
 
-            if (db.KeyExists(email))
+            if (db.KeyExists("user:" + email))
             {
-                var userString = db.StringGet(email);
+                var userString = db.StringGet("user:" + email);
                 User? user = JsonSerializer.Deserialize<User>(userString);
+
+                //Validation
+                if (!isValidPassword(password) && password != user.Password)
+                {
+                    throw new ValidationException("Password must meet the minimum requirements.");
+                }
+                if (!isValidName(name) && name != user.Name)
+                {
+                    throw new ValidationException("Name is not valid.");
+                }
+
                 if (user != null)
                 {
                     string newUserString;
@@ -101,19 +138,19 @@ namespace ApiWeb.Services
                         newUser = new User(email, user.Password, name, user.Id);
                         newUserString = JsonSerializer.Serialize(newUser);
 
-                        db.StringSet(email, newUserString);
+                        db.StringSet("user:" + email, newUserString);
                     } else if (user.Name == name && password != string.Empty)
                     {
                         newUser = new User(email, password, user.Name, user.Id, true);
                         newUserString = JsonSerializer.Serialize(newUser);
 
-                        db.StringSet(email, newUserString);
+                        db.StringSet("user:" + email, newUserString);
                     } else if (password != string.Empty && name != string.Empty)
                     {
                         newUser = new User(email, password, name, user.Id, true);
                         newUserString = JsonSerializer.Serialize(newUser);
 
-                        db.StringSet(email, newUserString);
+                        db.StringSet("user:" + email, newUserString);
                     } else
                     {
                         throw new InvalidOperationException("Attempted update with empty fields.");
@@ -134,9 +171,14 @@ namespace ApiWeb.Services
         {
             var db = Connection.GetDatabase();
 
-            if (db.KeyExists(email))
+            if (!isValidEmail(email))
             {
-                db.KeyDelete(email);
+                throw new ValidationException("Email is not valid.");
+            }
+
+            if (db.KeyExists("user:" + email))
+            {
+                db.KeyDelete("user:" + email);
             } else
             {
                 throw new InvalidOperationException("Email does not belong to an existing user.");

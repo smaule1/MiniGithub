@@ -1,9 +1,6 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
-using System.Net;
 
 namespace ApiWeb.Controllers
 {
