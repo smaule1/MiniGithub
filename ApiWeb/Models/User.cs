@@ -65,7 +65,7 @@ namespace ApiWeb.Models
         public User(string email, string password, string name, string id, bool changed)
         {
             // On update but password changed
-            if (changed) // This is just so it stops complaining about me not used the 'changed' parameter
+            if (changed) // This is just so it stops complaining about me not using the 'changed' parameter
             {
                 Email = email;
                 Password = HashPassword(password, email);
