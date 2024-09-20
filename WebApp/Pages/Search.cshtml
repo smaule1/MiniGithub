@@ -13,29 +13,32 @@
 </head>
 <body>
 
-    <form id="searchForm" class="row g-3" >        
-        <div class="col-md-5">            
-            <input id="searchField" type="text" class="form-control" placeholder="Nombre repositorio">
-        </div>   
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary mb-3">Search</button>
-        </div>
-    </form>
+    <div class="container">
+                
+        <div class="row">
+            <div class="input-group mb-3">
+                <input id="searchField" type="text" class="form-control" placeholder="Nombre repositorio" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <button id="searchButton" class="btn btn-outline-secondary" type="button">Search</button>
+            </div>
+        </div>        
 
-    <div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Visibility</th>
-                    <th>Tags</th>
-                </tr>
-            </thead>
-            <tbody id="tableRepos" class="table-group-divider">
-                <!-- Rows generated in js-->
-            </tbody>
-        </table>
+        <div class="row mt-3">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Visibility</th>
+                        <th>Tags</th>
+                    </tr>
+                </thead>
+                <tbody id="tableRepos" class="table group-divider">
+                    <!-- Rows generated in js-->
+
+                </tbody>
+            </table>
+        </div>
     </div>
+    
 
 </body>
 </html>

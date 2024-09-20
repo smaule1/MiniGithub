@@ -96,6 +96,43 @@ function ControlActions() {
         });
     };
 
+    this.PostToAPICommit = function (service, formData, callBackFunction) {
+        $.ajax({
+            type: "POST",
+            url: this.GetUrlApiService(service),
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (callBackFunction) {
+                    Swal.fire('Completado!', 'Transaction completed!');
+                    callBackFunction(data);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                var responseJson = jqXHR.responseJSON;
+                var message = jqXHR.responseText;
+
+                console.error("Error Status: ", textStatus);
+                console.error("Error Thrown: ", errorThrown);
+                console.error("Full Response: ", jqXHR);
+
+                if (responseJson) {
+                    var errors = responseJson.errors;
+                    var errorMessages = Object.values(errors).flat();
+                    message = errorMessages.join("<br/> ");
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: message,
+                });
+            }
+
+        });
+    };
+
     this.PutToAPI = function (service, data, callBackFunction) {
         $.put(this.GetUrlApiService(service), data, function (response) {
             Swal.fire('Completado!', 'Transaction completed!');

@@ -17,6 +17,12 @@ html {
   min-height: 100%;
 }
 
+.mainDiv{
+    height: 80vh;
+}
+
+
 body {
   margin-bottom: 60px;
 }
+
