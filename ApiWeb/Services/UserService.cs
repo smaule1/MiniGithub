@@ -50,18 +50,24 @@ namespace ApiWeb.Services
             });
         }
 
-        public void CreateUser(User user)
+        public void CreateUser(string email, string password, string name)
         {
             var db = Connection.GetDatabase();
 
-            if (db.KeyExists(user.Email))
+            if (db.KeyExists(email))
             {
                 throw new InvalidOperationException("An user with this email already exists.");
             }
 
-            string userString = JsonSerializer.Serialize(user);
-
-            db.StringSet(user.Email, userString);
+            if (password != string.Empty && name != string.Empty && email != string.Empty)
+            {
+                User user = new User(email, password, name);
+                string userString = JsonSerializer.Serialize(user);
+                db.StringSet(user.Email, userString);
+            } else
+            {
+                throw new InvalidOperationException("At least one required field is empty.");
+            }
         }
 
         public User? GetUser(string email)
@@ -78,18 +84,40 @@ namespace ApiWeb.Services
             return JsonSerializer.Deserialize<User>(userString);
         }
 
-        public void EditUser(string email, User user)
+        public void EditUser(string email, string name, string password)
         {
             var db = Connection.GetDatabase();
 
             if (db.KeyExists(email))
             {
-                if (email == user.Email)
+                var userString = db.StringGet(email);
+                User? user = JsonSerializer.Deserialize<User>(userString);
+                if (user != null)
                 {
-                    var newUser = new User(email, user.Password, user.Name, user.Id);
-                    string userString = JsonSerializer.Serialize(newUser);
+                    string newUserString;
+                    User newUser;
+                    if (password == user.Password && name != string.Empty)
+                    {
+                        newUser = new User(email, user.Password, name, user.Id);
+                        newUserString = JsonSerializer.Serialize(newUser);
 
-                    db.StringSet(email, userString);
+                        db.StringSet(email, newUserString);
+                    } else if (user.Name == name && password != string.Empty)
+                    {
+                        newUser = new User(email, password, user.Name, user.Id, true);
+                        newUserString = JsonSerializer.Serialize(newUser);
+
+                        db.StringSet(email, newUserString);
+                    } else if (password != string.Empty && name != string.Empty)
+                    {
+                        newUser = new User(email, password, name, user.Id, true);
+                        newUserString = JsonSerializer.Serialize(newUser);
+
+                        db.StringSet(email, newUserString);
+                    } else
+                    {
+                        throw new InvalidOperationException("Attempted update with empty fields.");
+                    }
                 }
                 else
                 {

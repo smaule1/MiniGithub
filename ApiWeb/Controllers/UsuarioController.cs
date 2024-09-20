@@ -33,11 +33,12 @@ namespace ApiWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] User user)
+        public IActionResult Create([FromBody] UserUpdateDTO user)
         {
             try
             {
-                userDb.CreateUser(user);
+                
+                userDb.CreateUser(user.Email, user.Password, user.Name);
                 return Ok();
             }
             catch (InvalidOperationException ex)
@@ -47,11 +48,11 @@ namespace ApiWeb.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(string id, [FromBody] User user)
+        public IActionResult Put(string id, [FromBody] UserUpdateDTO user)
         {
             try
             {
-                userDb.EditUser(id, user);
+                userDb.EditUser(id, user.Name, user.Password);
                 return Ok();
             }
             catch (InvalidOperationException ex)
