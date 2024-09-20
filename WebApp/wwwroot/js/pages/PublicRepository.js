@@ -32,8 +32,8 @@ async function loadRepo(id) {
 
 function displayRepository(repoObject) {
     repoName.innerHTML = repoObject.name;
-    repoVisibility.innerHTML = repoObject.visibility;
-    repoTags.innerHTML = repoObject.tags;
+    repoVisibility.innerHTML += repoObject.visibility;
+    repoTags.innerHTML += repoObject.tags;
 
     let branches = repoObject.branches;
 
