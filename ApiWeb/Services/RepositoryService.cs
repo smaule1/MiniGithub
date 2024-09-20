@@ -136,10 +136,11 @@ namespace ApiWeb.Services
 
         public IEnumerable<Commit> getAllCommits(string currentBranch)
         {
+
             var builder = Builders<Commit>.Filter;
             var filter = builder.Eq(x => x.BranchName, currentBranch);
-            return commitCollection.Find(filter).ToList();
-
+            var projection = Builders<Commit>.Projection.Expression(f => new Commit { Id = f.Id, Version = f.Version, Message = f.Message, FileId = f.FileId });
+            return commitCollection.Find(filter).Project(projection).ToList();
         }
 
         public Commit getCommitById(string commitId)
@@ -150,7 +151,7 @@ namespace ApiWeb.Services
 
         }
 
-
+        /*
         public int GetLastVersion(string commitId)
         {
 
@@ -163,7 +164,7 @@ namespace ApiWeb.Services
             return result != null ? result["Version"].AsInt32 : 0;
 
         }
-        
+        */
 
         public ActionResult getFile(string fileId)
         {

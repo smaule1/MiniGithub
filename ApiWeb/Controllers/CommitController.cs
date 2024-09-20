@@ -31,13 +31,14 @@ namespace ApiWeb.Controllers
             return Ok(repositorioDB.getAllCommits(currentBranch)); 
         }
 
+        /*
         [HttpGet]
         [Route("RetrieveLastVersion")]
         public ActionResult GetLastVersion(string currentCommit)
         {
             return Ok(repositorioDB.GetLastVersion(currentCommit));
         }
-
+        */
         
         [HttpGet]
         [Route("Download/{fileId}")]
