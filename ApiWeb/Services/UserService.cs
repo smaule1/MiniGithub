@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using ApiWeb.Models;
 using System.Text.Json;
+using DnsClient.Protocol;
 
 namespace ApiWeb.Services
 {
@@ -48,6 +49,11 @@ namespace ApiWeb.Services
 
             return keys.Select(k =>
             {
+                if (k.ToString().StartsWith("session:"))
+                {
+                    return null;
+                }
+
                 var value = db.StringGet(k);
 
                 if (value.IsNullOrEmpty)
@@ -56,7 +62,7 @@ namespace ApiWeb.Services
                 }
 
                 return JsonSerializer.Deserialize<User>(value);
-            });
+            }).Where(user => user != null);
         }
 
         public void CreateUser(string email, string password, string name)
