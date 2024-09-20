@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 
 namespace ApiWeb.Models
 {
-    public class Commit
+    public class CommitRequest
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -26,10 +26,7 @@ namespace ApiWeb.Models
         public string? Message { get; set; }
 
         [Required]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string FileId { get; set; }
-
-        public string FileName { get; set; }
+        public IFormFile File { get; set; }
 
 
     }
