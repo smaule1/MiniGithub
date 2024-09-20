@@ -16,58 +16,85 @@ submitBtn.addEventListener("click", (event) => {
     removeWarningClasses(tagInput);
     cleanAlerts();
 
-
-    let input;
     let isValid = true;
 
     //Name
-    input = nameInput.value;
-    if (input == "") {
+    let name = nameInput.value;
+    if (name == "") {
         setWarningClasses(nameInput);
         addAlert("El nombre del repositorio no puede estar vacío");
         isValid = false;
-    }else if (!isAlphanumeric(input)) {
+    }else if (!isAlphanumeric(name)) {
         setWarningClasses(nameInput);
         addAlert("El nombre del repositorio solo debe contener caracteres alfanumericos");
         isValid = false;
     }
 
     //Branch
-    input = branchInput.value;
-    if (input == "") {
+    let branch = branchInput.value;
+    if (branch == "") {
         setWarningClasses(branchInput);
         addAlert("El nombre del branch no puede estar vacío");
         isValid = false;
-    } else if (!isAlphanumeric(input)) {
+    } else if (!isAlphanumeric(branch)) {
         setWarningClasses(branchInput);
         addAlert("El nombre del branch solo debe contener caracteres alfanumericos");
         isValid = false;
     }
 
     //Tags
-
-    input = tagInput.value;
-    if (input!="") {
-        input = input.split(",");
-        for (let tag of input) {
+    let tags = tagInput.value;
+    if (tags != "") {
+        tags = tags.split(",");
+        for (let tag of tags) {
             if (!isAlphanumeric(tag)) {
                 setWarningClasses(tagInput);
-                addAlert("El nombre del branch solo debe contener caracteres alfanumericos o comas");
+                addAlert("El nombre las etiquetas solo debe contener caracteres alfanumericos o comas");
                 isValid = false;
             }
         }
+    } else {
+        tags = [];
     }
+
+    
+    let visibility = document.querySelector('input[name="visibility"]:checked').value;
     
         
     if (!isValid) return;
 
-    createRepository();
+    createRepository(name, branch, tags, visibility);
     
 }, false);
 
 
-function createRepository() {
+async function createRepository(name, branch, tags, visibility) {    
+    
 
+    const url = `https://localhost:7269/api/repository`;
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({ userId: "todo", name: name, tags: tags, visibility:visibility, branches: [{name:branch, latestCommit:null}]}),
+            headers: myHeaders
+        });
+
+        if (!response.ok) {
+            let obj = await response.json()            
+            if (obj.error = "Duplicate Key Error") {
+                addAlert(`Este usuario ya tiene un repositorio llamado ${name}`);
+            }
+        }
+
+        window.location.pathname = "/Homepage";  //TODO: cambiar por pagina de usuario
+       
+    } catch (error) {
+        console.error(error.message);
+        addAlert("Ocurrió un error inesperado");
+    }
 }
 
 
