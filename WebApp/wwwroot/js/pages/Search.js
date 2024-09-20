@@ -1,11 +1,11 @@
 ﻿
 
-const searchForm = document.getElementById("searchForm");
+const searchButton = document.getElementById("searchButton");
 const searchField = document.getElementById("searchField");
 const tableRepos = document.getElementById("tableRepos");
 
 
-searchForm.addEventListener("submit", (e) => {
+searchButton.addEventListener("click", (e) => {
     e.preventDefault();    
     tableRepos.innerHTML = null;
     let value = searchField.value;
@@ -41,7 +41,7 @@ async function search(name) {
 function displayRepository(value) {
     var row = `
         <tr>
-            <th> <a href="/PublicRepository?id=${value.id}"> ${value.name} </a> </th>
+            <td> <a href="/PublicRepository?id=${value.id}" class="link-primary"> ${value.name} </a> </td>
             <td>${value.visibility} </td>
             <td>${value.tags}</td>
         </tr>
