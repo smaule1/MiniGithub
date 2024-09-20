@@ -15,28 +15,42 @@
 
     <div class="container">
 
-        <div class="row align-items-center border-bottom border-2 mb-4">
+        <div class="row align-items-center border-bottom border-2 mb-5">
             <h2 class="col-8 justify-content-start ">Create Repository</h2>            
         </div>
 
-        @*Some input group*@
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-default">Default</span>
-            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-        </div>
+        <div class="row justify-content-center">
+            <div class="col-6">                
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Nombre del Repositorio</span>
+                    <input id="nameInput" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
 
+                <div id="visibilityInput" class="btn-group input-group mb-3" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">Privado</label>
 
-        @*Radio Buttons*@
-        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-            <label class="btn btn-outline-primary" for="btnradio1">Radio 1</label>
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio2">Público</label>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Etiquetas</span>
+                    <input id="tagInput" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Nombre de Branch</span>
+                    <input id="branchInput" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="Master">
+                </div>
+                <div class="row justify-content-end">
+                    <div class="col-3">
+                        <button id="submitBtn" class="btn btn-primary w-100" type="button">Crear</button>
+                    </div>
+                </div>
+                
+            </div>            
+        </div> 
 
-            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btnradio2">Radio 2</label>
-
-            <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btnradio3">Radio 3</label>
-        </div>
+        
         
     </div>
 
