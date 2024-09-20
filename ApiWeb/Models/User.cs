@@ -18,7 +18,7 @@ namespace ApiWeb.Models
         [Required]
         public string Id { get; }
 
-        private static string HashPassword(string password, string email)
+        public static string HashPassword(string password, string email)
         {
             string source = email + password;
             byte[] tmpSource = ASCIIEncoding.ASCII.GetBytes(source);

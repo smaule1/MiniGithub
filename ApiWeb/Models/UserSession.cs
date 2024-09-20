@@ -6,20 +6,17 @@ namespace ApiWeb.Models
     {
         public string SessionId { get; }
         [Required]
-        public string Name {  get; set; }
-        [Required]
         public string Email { get; set; }
         [Required]
-        public string Password { get; set; }
+        public string Name { get; set; }
         [Required]
         public string UserId { get; set; }
 
-        public UserSession(string name, string email, string password, string userId)
+        public UserSession(string email, string name, string userId)
         {
             SessionId = Guid.NewGuid().ToString();
-            Name = name;
             Email = email;
-            Password = password;
+            Name = name;
             UserId = userId;
         }
     }
