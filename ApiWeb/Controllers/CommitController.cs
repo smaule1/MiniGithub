@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using System;
 using System.Net;
 
@@ -46,14 +47,14 @@ namespace ApiWeb.Controllers
             }
         }
 
-        /*
+        
         [HttpGet]
-        [Route("RetrieveFile")]
-        public ActionResult GetFile(string id)
+        [Route("Download/{fileId}")]
+        public ActionResult GetFile(string fileId)
         {
-            return Ok(repositorioDB.getAllCommits(currentBranch));
+            return repositorioDB.getFile(fileId);
         }
-        */
+        
 
         [HttpPost]
         [Route("Create")]

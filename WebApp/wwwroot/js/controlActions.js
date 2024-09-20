@@ -152,7 +152,7 @@ function ControlActions() {
                 icon: 'error',
                 title: 'Oops...',
                 html: message,
-                
+
             });
         });
     };
@@ -176,7 +176,7 @@ function ControlActions() {
                 icon: 'error',
                 title: 'Oops...',
                 html: message,
-                
+
             });
         });
     };

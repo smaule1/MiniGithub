@@ -150,19 +150,29 @@ namespace ApiWeb.Services
 
         }
 
-        /*
+        
         public ActionResult getFile(string fileId)
         {
 
             // Get the file from GridFS
-            var stream = GridFS.OpenDownloadStream(fileId);
-            var builder = Builders<GridFSFileInfo>.Filter;
-            var fileInfo = GridFS.Find(builder.Eq("_id", fileId)).FirstOrDefaultAsync();
+            var objectId = new ObjectId(fileId);
+            var stream = GridFS.OpenDownloadStream(objectId);
 
-            return fileInfo;
+            var builder = Builders<GridFSFileInfo>.Filter;
+            var fileInfo = GridFS.Find(builder.Eq("_id", objectId)).FirstOrDefault();
+
+            var fileMetadata = fileInfo.Metadata;
+            var fileName = fileInfo.Filename;
+
+            var contentType = fileMetadata["ContentType"].AsString;
+
+            return new FileStreamResult(stream, contentType)
+            {
+                FileDownloadName = fileName
+            };
 
         }
-        */
+        
 
         public void createCommit(CommitRequest request)
         {
@@ -173,7 +183,6 @@ namespace ApiWeb.Services
                     Metadata = new BsonDocument
                 {
                     { "contentType", request.File.ContentType },
-                    { "filename", request.File.FileName }
                 }
                 };
 
