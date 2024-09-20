@@ -1,13 +1,9 @@
 ﻿
-
-console.log("it woooooooorks");
-
-
 getData();
 
 
 async function getData() {
-    const url = "https://localhost:7269/api/repositorory/public/all/samuel";
+    const url = "https://localhost:7269/api/repository/public/all/samuel";
     try {
         const response = await fetch(url);
         if (!response.ok) {
