@@ -150,7 +150,21 @@ namespace ApiWeb.Services
 
         }
 
+
+        public int GetLastVersion(string commitId)
+        {
+
+            var builder = Builders<Commit>.Filter;
+            var filter = builder.Eq(x => x.Id, commitId);
+            var project = Builders<Commit>.Projection.Include(f => f.Version).Exclude(f => f.Id);
+
+            var result = commitCollection.Find(filter).Project(project).FirstOrDefault();
+
+            return result != null ? result["Version"].AsInt32 : 0;
+
+        }
         
+
         public ActionResult getFile(string fileId)
         {
 
@@ -182,7 +196,7 @@ namespace ApiWeb.Services
                 {
                     Metadata = new BsonDocument
                 {
-                    { "contentType", request.File.ContentType },
+                    { "ContentType", request.File.ContentType },
                 }
                 };
 

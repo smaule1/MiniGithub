@@ -32,19 +32,10 @@ namespace ApiWeb.Controllers
         }
 
         [HttpGet]
-        [Route("RetrieveById")]
-        public ActionResult GetByContentId(int contenidoId)
+        [Route("RetrieveLastVersion")]
+        public ActionResult GetLastVersion(string currentCommit)
         {
-            try
-            {
-                var reviewManager = new ReviewManager();
-                var result = reviewManager.RetrieveByContentId(contenidoId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(repositorioDB.GetLastVersion(currentCommit));
         }
 
         
