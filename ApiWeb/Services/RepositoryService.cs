@@ -1,16 +1,15 @@
 ﻿using Microsoft.Extensions.Options;
 using ApiWeb.Models;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.OpenApi;
+using MongoDB.Driver.GridFS;
 using ApiWeb.Data;
-using static MongoDB.Driver.WriteConcern;
-using NuGet.Protocol.Core.Types;
 using System.Data;
 using MongoDB.Driver.Linq;
 using Repository = ApiWeb.Models.Repository;
+using StackExchange.Redis;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using MongoDB.Driver.Core.WireProtocol.Messages;
 
 namespace ApiWeb.Services
 {
@@ -20,12 +19,14 @@ namespace ApiWeb.Services
 
         public readonly IMongoDatabase db;
         private readonly IDictionary<string, string> collectionNames;
+        private readonly GridFSBucket _gridFS;
 
         public RepositoryService(IOptions<MongoDBSettings> options)
         {
             var client = new MongoClient(options.Value.ConnectionString);
             db = client.GetDatabase(options.Value.DatabaseName);
             collectionNames = options.Value.Collections;
+            _gridFS = new GridFSBucket(db);
         }
 
 
@@ -128,6 +129,7 @@ namespace ApiWeb.Services
         //Methods were added in this same file, so
         //another MongoClient isn't needed
 
+        public GridFSBucket GridFS => _gridFS;
         public IMongoCollection<Commit> commitCollection =>
              db.GetCollection<Commit>(collectionNames["Collection2"]);
 
@@ -148,11 +150,50 @@ namespace ApiWeb.Services
 
         }
 
-        public void createCommit(Commit commit)
+        /*
+        public ActionResult getFile(string fileId)
+        {
+
+            // Get the file from GridFS
+            var stream = GridFS.OpenDownloadStream(fileId);
+            var builder = Builders<GridFSFileInfo>.Filter;
+            var fileInfo = GridFS.Find(builder.Eq("_id", fileId)).FirstOrDefaultAsync();
+
+            return fileInfo;
+
+        }
+        */
+
+        public void createCommit(CommitRequest request)
         {
             try
             {
+                var options = new GridFSUploadOptions
+                {
+                    Metadata = new BsonDocument
+                {
+                    { "contentType", request.File.ContentType },
+                    { "filename", request.File.FileName }
+                }
+                };
+
+                // Upload the file to GridFS
+                var fileId = GridFS.UploadFromStream(request.File.FileName, request.File.OpenReadStream(), options);
+
+                // Create a new Commit object
+                var commit = new Commit
+                {
+                    RepoName = request.RepoName,
+                    BranchName = request.BranchName,
+                    Version = request.Version,
+                    Message = request.Message,
+                    FileId = fileId.ToString(),
+                    FileName = request.File.FileName
+                };
+
+                // Save the commit to Mongo
                 commitCollection.InsertOne(commit);
+
             }
             catch (MongoWriteException) { throw; }
         }

@@ -25,14 +25,14 @@ namespace ApiWeb.Controllers
 
         [HttpGet]
         [Route("RetrieveAll")]
-        public ActionResult RetrieveAll(string currentBranch)
+        public ActionResult GetAll(string currentBranch)
         {
             return Ok(repositorioDB.getAllCommits(currentBranch)); 
         }
 
         [HttpGet]
         [Route("RetrieveById")]
-        public ActionResult RetrieveByContentId(int contenidoId)
+        public ActionResult GetByContentId(int contenidoId)
         {
             try
             {
@@ -46,14 +46,22 @@ namespace ApiWeb.Controllers
             }
         }
 
+        /*
+        [HttpGet]
+        [Route("RetrieveFile")]
+        public ActionResult GetFile(string id)
+        {
+            return Ok(repositorioDB.getAllCommits(currentBranch));
+        }
+        */
 
         [HttpPost]
         [Route("Create")]
-        public ActionResult Create(Commit commit)
+        public ActionResult Create(CommitRequest commitRequest)
         {
             try
             {
-                repositorioDB.createCommit(commit);
+                repositorioDB.createCommit(commitRequest);
                 return Created();
 
             }
