@@ -64,7 +64,7 @@ async function registerUser(email, password, name) {
 
     } catch (error) {
         console.error(error.message);
-        addAlert("An unexpected error has occured.");
+        addAlert("Ocurrió un error inesperado.");
     }
 }
 

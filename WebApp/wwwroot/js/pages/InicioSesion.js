@@ -53,7 +53,7 @@ async function logIn(email, password) {
         }
     } catch (error) {
         console.error(error.message);
-        addAlert("An unexpected error has occured.");
+        addAlert("Ocurrió un error inesperado.");
     }
 }
 
