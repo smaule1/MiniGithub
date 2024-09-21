@@ -32,6 +32,9 @@ builder.Services.AddSingleton<RepositoryService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<UserSessionService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
