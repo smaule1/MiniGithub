@@ -24,12 +24,22 @@ function changeDropdown(text) {
 //Listens the "click" event to create a Commit
 function createCommit() {
     $("#acceptModalButton").click(() => {
-        registrarCommit();
+        //registrarCommit();
+        multipleFiles();
     });
 }
 
+function multipleFiles() {
+    //Necesita traer elementos guardados en el SessionStorage
+
+    var message = $("#commitMsg").val();
+    var file = document.getElementById('file').files;
+    console.log(file);
+
+}
+
 //This function create a commit
-function registrarCommit(version) {
+function registrarCommit() {
     //Necesita traer elementos guardados en el SessionStorage
     var lastVersion = Number(sessionStorage.getItem("Version"));
     lastVersion += 1;
@@ -38,7 +48,8 @@ function registrarCommit(version) {
     var formData = new FormData(); // Crear un objeto FormData
 
     var message = $("#commitMsg").val();
-    var file = document.getElementById('file').files[0];
+    var file = document.getElementById('file').files;
+    console.log(file);
 
     formData.append('repoName', "MiniGithub");
     formData.append('branchName', sessionStorage.getItem("Branch"));
@@ -87,6 +98,7 @@ function commitController() {
                     commitList.append(listElement);
                 });
             } else {
+                sessionStorage.setItem("Version", 0);
                 commitList.append('<p>No hay commits aún.</p>');
             }
         },

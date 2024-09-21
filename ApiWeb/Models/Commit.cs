@@ -26,10 +26,9 @@ namespace ApiWeb.Models
         public string? Message { get; set; }
 
         [Required]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string FileId { get; set; }
+        public List<ObjectId> FileId { get; set; }
 
-        public string FileName { get; set; }
+        public List<string> FileName { get; set; }
 
 
     }

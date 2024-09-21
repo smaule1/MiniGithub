@@ -174,7 +174,7 @@ namespace ApiWeb.Services
             var stream = GridFS.OpenDownloadStream(objectId);
 
             var builder = Builders<GridFSFileInfo>.Filter;
-            var fileInfo = GridFS.Find(builder.Eq("_id", objectId)).FirstOrDefault();
+            var fileInfo = GridFS.Find(builder.Eq("_id", objectId)).toList();
 
             var fileMetadata = fileInfo.Metadata;
             var fileName = fileInfo.Filename;
@@ -193,16 +193,22 @@ namespace ApiWeb.Services
         {
             try
             {
-                var options = new GridFSUploadOptions
-                {
-                    Metadata = new BsonDocument
-                {
-                    { "ContentType", request.File.ContentType },
-                }
-                };
+                List<ObjectId> fileId = new List<ObjectId>();
+                List<string> filename = new List<string>();
 
-                // Upload the file to GridFS
-                var fileId = GridFS.UploadFromStream(request.File.FileName, request.File.OpenReadStream(), options);
+                foreach (var ele in request.File) {
+
+                    var options = new GridFSUploadOptions
+                    {
+                        Metadata = new BsonDocument {{ "ContentType", ele.ContentType
+                        }}
+                    };
+
+                    // Upload the file to GridFS
+                    fileId.Add(GridFS.UploadFromStream(ele.FileName, ele.OpenReadStream(), options));
+                    filename.Add(ele.FileName);
+                }
+
 
                 // Create a new Commit object
                 var commit = new Commit
@@ -211,8 +217,8 @@ namespace ApiWeb.Services
                     BranchName = request.BranchName,
                     Version = request.Version,
                     Message = request.Message,
-                    FileId = fileId.ToString(),
-                    FileName = request.File.FileName
+                    FileId = fileId,
+                    FileName = filename
                 };
 
                 // Save the commit to Mongo

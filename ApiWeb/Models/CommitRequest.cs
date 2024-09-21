@@ -26,7 +26,7 @@ namespace ApiWeb.Models
         public string? Message { get; set; }
 
         [Required]
-        public IFormFile File { get; set; }
+        public List<IFormFile> File { get; set; }
 
 
     }
