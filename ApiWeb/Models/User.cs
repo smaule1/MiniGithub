@@ -35,6 +35,11 @@ namespace ApiWeb.Models
             return output.ToString();
         }
 
+        public static bool passConfirm(string password, string conf)
+        {
+            return password.Equals(conf);
+        }
+
         public User(string email, string password, string name)
         {
             // On user create

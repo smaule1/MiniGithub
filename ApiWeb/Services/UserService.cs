@@ -85,19 +85,26 @@ namespace ApiWeb.Services
 
             if (db.KeyExists("user:" + email))
             {
-                throw new InvalidOperationException("An user with this email already exists.");
+                throw new InvalidOperationException("Ya existe un usuario con el email ingresado.");
             }
             if (!isValidEmail(email))
             {
-                throw new ValidationException("Email is not valid.");
+                throw new ValidationException("El email ingresado no es válido.");
             }
             if (!isValidPassword(password))
             {
-                throw new ValidationException("Password must meet the minimum requirements.");
+                throw new ValidationException($"La contraseña debe cumplir con los requisitos:<br>" +
+                    $"1. Mínimo 8 caracteres.<br>" +
+                    $"2. Mínimo una letra mayúscula.<br>" +
+                    $"3. Mínimo una letra minúscula.<br>" +
+                    $"4. Mínimo un número.<br>" +
+                    $"5. Mínimo un caracter especial.");
             }
             if (!isValidName(name))
             {
-                throw new ValidationException("Name is not valid.");
+                throw new ValidationException($"El nombre debe cumplir con los requisitos:<br>" +
+                    $"1. De 2 a 16 caracteres.<br>" +
+                    $"2. Solo debe contener letras, números, '-' o '_'.");
             }
 
             if (password != string.Empty && name != string.Empty && email != string.Empty)

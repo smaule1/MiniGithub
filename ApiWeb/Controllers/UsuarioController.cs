@@ -50,17 +50,16 @@ namespace ApiWeb.Controllers
         {
             try
             {
-                
                 userDb.CreateUser(user.Email, user.Password, user.Name);
                 return Ok();
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = "Invalid Operation", message = ex.Message });
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = "Invalid Input", message = ex.Message, type = ex.Message.Split(' ')[1] });
             }
         }
 
