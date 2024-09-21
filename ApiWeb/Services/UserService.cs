@@ -50,7 +50,7 @@ namespace ApiWeb.Services
         {
             if (string.IsNullOrEmpty(n)) return false;
 
-            if (n.Length < 2 || n.Length > 30) return false;
+            if (n.Length < 2 || n.Length > 16) return false;
 
             return n.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_');
         }
@@ -83,7 +83,7 @@ namespace ApiWeb.Services
         {
             var db = Connection.GetDatabase();
 
-            if (db.KeyExists(email))
+            if (db.KeyExists("user:" + email))
             {
                 throw new InvalidOperationException("An user with this email already exists.");
             }

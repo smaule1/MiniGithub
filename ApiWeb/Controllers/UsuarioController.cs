@@ -1,6 +1,8 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
+using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiWeb.Controllers
 {
@@ -24,9 +26,23 @@ namespace ApiWeb.Controllers
         }
 
         [HttpGet("{id}")]
-        public User? Get(string id)
+        public IActionResult Get(string id)
         {
-            return userDb.GetUser(id);
+            try
+            {
+                var user = userDb.GetUser(id);
+
+                if(user == null)
+                {
+                    return NotFound("Could not find requested user.");
+                }
+
+                return Ok(user);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -39,6 +55,10 @@ namespace ApiWeb.Controllers
                 return Ok();
             }
             catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -56,6 +76,10 @@ namespace ApiWeb.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
@@ -68,6 +92,10 @@ namespace ApiWeb.Controllers
                 return Ok();
             }
             catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
             }
