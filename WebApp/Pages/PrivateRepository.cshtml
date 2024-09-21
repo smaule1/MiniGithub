@@ -41,8 +41,22 @@
             <div class="col-4 border-start p-4">            
                 <button id="modifyBtn" type="button" class="btn btn-primary w-100 m-2">Modificar Repositorio</button>
                 <button id="deleteBtn" type="button" class="btn btn-danger w-100 m-2">Eliminar Repositorio</button>
-                <hr />
-                <button id="createBranchBtn" type="button" class="btn btn-primary w-100 m-2">Crear Branch</button>
+                <hr />                
+                <div class="accordion accordion" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                Crear Branch
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body">
+                                <input id="branchNameInput" type="text" class="form-control" placeholder="Nombre del Branch"/>
+                                <button id="createBranchBtn" type="button" class="btn btn-primary w-100 m-2">Crear Branch</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <button id="deleteBranchBtn" type="button" class="btn btn-danger w-100 m-2">Eliminar Branch</button>
             </div>
         </div>

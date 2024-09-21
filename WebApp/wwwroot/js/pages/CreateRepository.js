@@ -2,7 +2,6 @@
 const nameInput = document.getElementById("nameInput");
 const visibilityInput = document.getElementById("visibilityInput");
 const tagInput = document.getElementById("tagInput");
-const branchInput = document.getElementById("branchInput");
 const alertDiv = document.getElementById("alertDiv");
 const submitBtn = document.getElementById("submitBtn");
 
@@ -12,7 +11,6 @@ submitBtn.addEventListener("click", (event) => {
     event.preventDefault();    
 
     removeWarningClasses(nameInput);
-    removeWarningClasses(branchInput);
     removeWarningClasses(tagInput);
     cleanAlerts();
 
@@ -30,19 +28,7 @@ submitBtn.addEventListener("click", (event) => {
         addAlert("El nombre del repositorio solo debe contener caracteres alfanumericos");
         isValid = false;
     }
-
-    //Branch
-    let branch = branchInput.value;
-    if (branch == "") {
-        setWarningClasses(branchInput);
-        addAlert("El nombre del branch no puede estar vacío");
-        isValid = false;
-    } else if (!isAlphanumeric(branch)) {
-        setWarningClasses(branchInput);
-        addAlert("El nombre del branch solo debe contener caracteres alfanumericos");
-        isValid = false;
-    }
-    name.replaceAll(" ", "-");
+    name = name.replaceAll(" ", "-");
 
     //Tags
     let tags = tagInput.value;
@@ -65,14 +51,12 @@ submitBtn.addEventListener("click", (event) => {
         
     if (!isValid) return;
 
-    createRepository(name, branch, tags, visibility);
+    createRepository(name, tags, visibility);
     
 }, false);
 
 
-async function createRepository(name, branch, tags, visibility) {    
-    
-
+async function createRepository(name, tags, visibility) {        
     const url = `https://localhost:7269/api/repository`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -80,7 +64,7 @@ async function createRepository(name, branch, tags, visibility) {
     try {
         const response = await fetch(url, {
             method: "POST",
-            body: JSON.stringify({ userId: "todo", name: name, tags: tags, visibility:visibility, branches: [{name:branch, latestCommit:null}]}),
+            body: JSON.stringify({ userId: "todo", name: name, tags: tags, visibility:visibility}),
             headers: myHeaders
         });
 

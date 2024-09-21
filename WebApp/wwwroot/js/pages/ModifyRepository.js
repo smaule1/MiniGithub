@@ -59,7 +59,7 @@ submitBtn.addEventListener("click", (event) => {
         addAlert("El nombre del repositorio solo debe contener caracteres alfanumericos");
         isValid = false;
     }
-    name.replaceAll(" ", "-");    
+    name = name.replaceAll(" ", "-");    
 
     //Tags
     let tags = tagInput.value;
