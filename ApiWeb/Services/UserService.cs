@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using ApiWeb.Models;
 using System.Text.Json;
 using DnsClient.Protocol;
+using System.Text.RegularExpressions;
 
 namespace ApiWeb.Services
 {
@@ -28,17 +29,30 @@ namespace ApiWeb.Services
 
         private bool isValidEmail(string e)
         {
-            return true;
+            var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(e, emailPattern);
         }
 
         private bool isValidPassword(string p)
         {
-            return true;
+            if (string.IsNullOrEmpty(p)) return false;
+            if (p.Length < 8) return false;
+
+            bool hasUpper = p.Any(char.IsUpper);
+            bool hasLower = p.Any(char.IsLower);
+            bool hasDigit = p.Any(char.IsDigit);
+            bool hasSpecial = p.Any(ch => !char.IsLetterOrDigit(ch));
+
+            return hasUpper && hasLower && hasDigit && hasSpecial;
         }
 
         private bool isValidName(string n)
         {
-            return true;
+            if (string.IsNullOrEmpty(n)) return false;
+
+            if (n.Length < 2 || n.Length > 30) return false;
+
+            return n.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_');
         }
 
         public IEnumerable<User?> GetUsers()
