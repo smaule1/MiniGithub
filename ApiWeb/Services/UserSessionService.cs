@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using ApiWeb.Models;
 using System.Text.Json;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace ApiWeb.Services
 {
@@ -58,6 +59,20 @@ namespace ApiWeb.Services
             {
                 throw new KeyNotFoundException("Requested user does not exist.");
             }
+        }
+
+        public static UserSession? GetSession(string sessionId)
+        {
+            var db = Connection.GetDatabase();
+
+            string? sessionString = db.StringGet("session:" + sessionId);
+
+            if (sessionString == null)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<UserSession>(sessionString);
         }
 
         public bool VerifySession(string sessionId)

@@ -114,7 +114,7 @@ namespace ApiWeb.Services
                 db.StringSet("user:" + user.Email, userString);
             } else
             {
-                throw new InvalidOperationException("At least one required field is empty.");
+                throw new InvalidOperationException("Al menos un campo requerido está vacío.");
             }
         }
 
@@ -122,7 +122,7 @@ namespace ApiWeb.Services
         {
             if (!isValidEmail(email))
             {
-                throw new ValidationException("Email is not valid.");
+                throw new ValidationException("El email ingresado no es válido..");
             }
 
             var db = Connection.GetDatabase();
@@ -149,11 +149,11 @@ namespace ApiWeb.Services
                 //Validation
                 if (!isValidPassword(password) && password != user.Password)
                 {
-                    throw new ValidationException("Password must meet the minimum requirements.");
+                    throw new ValidationException("La contraseña debe cumplir con los requisitos.");
                 }
                 if (!isValidName(name) && name != user.Name)
                 {
-                    throw new ValidationException("Name is not valid.");
+                    throw new ValidationException("El nombre debe cumplir con los requisitos.");
                 }
 
                 if (user != null)
@@ -180,17 +180,17 @@ namespace ApiWeb.Services
                         db.StringSet("user:" + email, newUserString);
                     } else
                     {
-                        throw new InvalidOperationException("Attempted update with empty fields.");
+                        throw new InvalidOperationException("Se inttentó actualizar con campos vacíos.");
                     }
                 }
                 else
                 {
-                    throw new InvalidOperationException("Attempting to modify an user without authorization.");
+                    throw new InvalidOperationException("Intento de actualización sin autorización.");
                 }
             }
             else
             {
-                throw new InvalidOperationException("Requested user does not exist.");
+                throw new InvalidOperationException("El usuario solicitado no existe.");
             }
         }
 
@@ -200,7 +200,7 @@ namespace ApiWeb.Services
 
             if (!isValidEmail(email))
             {
-                throw new ValidationException("Email is not valid.");
+                throw new ValidationException("El email ingresado no es válido..");
             }
 
             if (db.KeyExists("user:" + email))
@@ -208,7 +208,7 @@ namespace ApiWeb.Services
                 db.KeyDelete("user:" + email);
             } else
             {
-                throw new InvalidOperationException("Email does not belong to an existing user.");
+                throw new InvalidOperationException("El email no pertenece a ningún usuario existente.");
             }
         }
     }

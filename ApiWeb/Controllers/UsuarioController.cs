@@ -2,6 +2,7 @@
 using ApiWeb.Services;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApiWeb.Controllers
@@ -34,14 +35,14 @@ namespace ApiWeb.Controllers
 
                 if(user == null)
                 {
-                    return NotFound("Could not find requested user.");
+                    return NotFound(new { error = "Not found", message = "No se encontró al usuario solicitado." });
                 }
 
                 return Ok(user);
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = "Invalid Input", message = ex.Message });
             }
         }
 
@@ -73,11 +74,11 @@ namespace ApiWeb.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = "Invalid Operation", message = ex.Message });
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = "Invalid Input", message = ex.Message, type = ex.Message.Split(' ')[1] });
             }
         }
 
@@ -92,11 +93,11 @@ namespace ApiWeb.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = "Invalid Operation", message = ex.Message });
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(new { error = "Invalid Input", message = ex.Message });
             }
         }
     }

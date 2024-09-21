@@ -1,8 +1,10 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization.IdGenerators;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace ApiWeb.Controllers
 {
@@ -20,8 +22,20 @@ namespace ApiWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(string email, string password)
+        public IActionResult Create([FromBody] JsonElement data)
         {
+            var email = data.GetProperty("email").GetString();
+            var password = data.GetProperty("password").GetString();
+
+            if (email.IsNullOrEmpty())
+            {
+                return BadRequest(new { error = "Invalid Input", message = "El email está vacío." , type = "Email"});
+            }
+            if (password.IsNullOrEmpty())
+            {
+                return BadRequest(new { error = "Invalid Input", message = "La contraseña está vacía.", type = "Password" });
+            }
+
             try
             {
                 string sessionId = sessionDb.Login(email, password);
@@ -33,15 +47,17 @@ namespace ApiWeb.Controllers
 
                 Response.Cookies.Append("SessionId", sessionId, cookieOptions);
 
-                return Ok("Logged in successfully!");
+                var sessionData = UserSessionService.GetSession(sessionId);
+
+                return Ok(sessionData);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(new { error = "Not Auth", message = ex.Message });
             }
             catch (KeyNotFoundException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(new { error = "Not Found", message = ex.Message });
             }
         }
 
@@ -60,18 +76,18 @@ namespace ApiWeb.Controllers
                     }
                     else
                     {
-                        return Unauthorized("Current session is not valid or is expired.");
+                        return Unauthorized(new { error = "Not Auth", message = "La sesión actual no es válida o está expirada.", type = "Not valid" });
                     }
                 }
                 else
                 {
-                    return Unauthorized("Current session is invalid.");
+                    return Unauthorized(new { error = "Not Auth", message = "La sesión actual no es válida.", type = "No session"});
                 }
 
             }
             catch (KeyNotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(new { error = "Not Found", message = ex.Message });
             }
 
         }
@@ -86,16 +102,16 @@ namespace ApiWeb.Controllers
                 if (sessionId != null)
                 {
                     sessionDb.Logout(sessionId);
-                    return Ok("Logged out successfully!");
+                    return Ok();
                 }
                 else
                 {
-                    return Unauthorized("Current session is invalid.");
+                    return Unauthorized(new { error = "Not Auth", message = "La sesión actual no es válida.", type = "No session" });
                 }
             }
             catch (KeyNotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(new { error = "Not Found", message = ex.Message });
             }
         }
     }

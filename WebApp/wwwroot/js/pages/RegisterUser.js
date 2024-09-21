@@ -33,40 +33,32 @@ async function registerUser(email, password, name) {
     myHeaders.append("Content-Type", "application/json");
 
     try {
-        console.log("here 1");
         const response = await fetch(url, {
             method: "POST",
             body: JSON.stringify({ password: password, email: email, name: name }),
             headers: myHeaders
         });
 
-        console.log("here 2");
         if (!response.ok) {
-            console.log("here 3");
             let obj = await response.json();
             if (obj.error == "Invalid Input") {
                 if (obj.type == "nombre") {
-                    console.log("here 4");
                     setWarningClasses(nameInput);
                     addAlert(obj.message);
                 }
                 if (obj.type == "email") {
-                    console.log("here 5");
                     setWarningClasses(emailInput);
                     addAlert(obj.message);
                 }
                 if (obj.type == "contraseña") {
-                    console.log("here 6");
                     setWarningClasses(passwordInput);
                     addAlert(obj.message);
                 }
             } else if (obj.error == "Invalid Operation") {
-                console.log("here 8", response.status);
                 setWarningClasses(emailInput);
                 addAlert(obj.message);
             }
         } else {
-            console.log("here 7", response.status);
             window.location.pathname = "/Iniciosesion";
         }
 
