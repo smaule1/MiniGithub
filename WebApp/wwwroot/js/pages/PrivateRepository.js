@@ -8,6 +8,7 @@ const repoVisibility = document.getElementById("repoVisibility");
 const repoTags = document.getElementById("repoTags");
 const branchSelect = document.getElementById("branchSelect");
 
+let repository = null;
 
 loadRepo(urlParams.get("id"));
 
@@ -19,9 +20,9 @@ async function loadRepo(id) {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        const repoObj = await response.json();
+        repository = await response.json();
 
-        displayRepository(repoObj);
+        displayRepository(repository);
 
     } catch (error) {
         console.error(error.message);
@@ -43,6 +44,41 @@ function displayRepository(repoObject) {
     }
 }
 
+
+document.getElementById("modifyBtn").addEventListener("click", (e) => { 
+    window.location.href = `/ModifyRepository?id=${repository.id}&v=${repository.visibility}`;;
+});
+
+document.getElementById("deleteBtn").addEventListener("click", async (e) => {
+    const url = `https://localhost:7269/api/repository/${repository.id}`;    
+    try {
+        const response = await fetch(url, {method: "DELETE"});
+        if (!response.ok) {
+            alert("Unexpected error");
+            return;
+        }
+
+        window.location.pathname = "/UserPage";
+
+    } catch (error) {
+        console.error(error.message);        
+    }       
+});
+
+document.getElementById("createBranchBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.pathname = "/CreateRepository";
+});
+
+document.getElementById("deleteBranchBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.pathname = "/CreateRepository";
+});
+
+
+
+
+
 function displayBranch(branch) {
-    $("#branchDiv").append(`<h1>${branch.latestCommit}: poner datos del commit o algo así</h1>`);
+    $("#branchDiv").append(`<h5>${branch.latestCommit}: poner datos del commit o algo así</h5>`);
 }
