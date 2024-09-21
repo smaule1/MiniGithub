@@ -17,12 +17,12 @@ namespace ApiWeb.Controllers
         // GET: api/<CommentController>/GetAll
         [HttpGet]
         [Route("GetAll")]
-        public IEnumerable<Comment> GetComments()
+        public IEnumerable<Comment> GetAllComments()
         {
             return _commentService.GetComments();
         }
 
-        // GET api/<CommentController>/GetByID/5
+        // GET api/<CommentController>/GetByID
         [HttpGet]
         [Route("GetByID")]
         public Comment GetCommentById(Guid id)
@@ -32,7 +32,7 @@ namespace ApiWeb.Controllers
 
         [HttpGet]
         [Route("GetByUser")]
-        public IEnumerable<Comment> GetCommentByUser(string user)
+        public IEnumerable<Comment> GetCommentsByUser(string user)
         {
             List<Comment> comments = _commentService.GetComments();
             List<Comment> userComments = [];
@@ -66,10 +66,10 @@ namespace ApiWeb.Controllers
             return userComments;
         }
 
-        // GET: api/<CommentController>/GetAll
+        // GET: api/<CommentController>/GetByRepoId
         [HttpGet]
         [Route("GetByRepoId")]
-        public IEnumerable<Comment> GetByRepoId(string repoId)
+        public IEnumerable<Comment> GetCommentsByRepoId(string repoId)
         {
             List<Comment> comments = _commentService.GetComments();
             List<Comment> repoComments = [];

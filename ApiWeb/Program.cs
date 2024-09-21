@@ -33,7 +33,7 @@ builder.Services.Configure<CassandraSettings>(
 
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
 builder.Services.AddSingleton<RepositoryService>();
-builder.Services.AddSingleton<CommentController>();
+builder.Services.AddSingleton<CommentService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

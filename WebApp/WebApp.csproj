@@ -14,6 +14,7 @@
     <Content Remove="Pages\VerReview.cshtml" />
   </ItemGroup>
 
+
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.21.2" />
@@ -45,6 +46,10 @@
 
   <ItemGroup>
     <None Include="Pages\VerReview.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiWeb\ApiWeb.csproj" />
   </ItemGroup>
 
 </Project>

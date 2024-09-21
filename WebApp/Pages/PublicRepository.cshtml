@@ -11,6 +11,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="~/js/pages/PublicRepository.js" defer></script>
+
+    <style>
+        .info-container {
+            overflow: auto;
+            padding-bottom: 100px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .comment-container {
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comment-date {
+            font-size: 0.875rem;
+            color: #c0c3c5;
+            display: block;
+        }
+
+        .comment-message {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .response-button {
+            align-items: start;
+            border: none;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .subcomment-container {
+            display: block;
+        }
+
+        .subcomment {
+            margin-left: 2rem;
+            border-left: 3px solid #dee2e6;
+            padding-left: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .subcomment-btn {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            color: #8d9397;
+            padding: 10px;
+            cursor: pointer;
+            text-align: left;
+            display: block;
+        }
+
+    </style>
+
 </head>
 <body>
     <div class="container">
@@ -29,6 +97,91 @@
         </div>                
         <div id="branchDiv" class="row border border-2 rounded-4 py-5 mt-4">
             
+        </div>
+
+        <div class="comment-container">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+
+                    @*foreach (var comment in GetByRepoId)*@
+                        <div class="card mt-3 shadow-lg" id="2">
+                            <div class="comment-header bg-primary text-white p-3">
+                                <div>
+                                    <span class="card-title mb-0">comment.User</span>
+                                    <span class="comment-date">comment.GetDate()</span>
+                                </div>
+                                <div class="button-container">
+                                    <button class="response-button">Borrar</button>
+                                    <button class="response-button">Editar</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="comment-message">comment.Message</div>
+                                <div class="button-container">
+                                    <button class="response-button">Responder</button>
+						        </div>
+                            <button class="subcomment-btn">Subcomments ʌ</button>
+
+						        <div class="subcomment-container">
+
+                                @*foreach (var subcomment in comment.Subcomments)*@
+                                        <div class="subcomment">
+                                            <div class="comment-header bg-secondary text-white p-2">
+                                                <div>
+                                                    <span class="card-title mb-0">subcomment.User</span>
+                                                    <span class="comment-date">subcomment.GetDate()</span>
+                                                </div>
+                                                <div class="button-container">
+                                                    <button class="response-button">Borrar</button>
+                                                    <button class="response-button">Editar</button>
+                                                </div>
+                                            </div>
+                                            <div class="comment-message p-2">subcomment.Message</div>
+                                        </div>
+                                        <div class="subcomment">
+                                            <div class="comment-header bg-secondary text-white p-2">
+                                                <div>
+                                                    <span class="card-title mb-0">subcomment.User</span>
+                                                    <span class="comment-date">subcomment.GetDate()</span>
+                                                </div>
+                                                <div class="button-container">
+                                                    <button class="response-button">Borrar</button>
+                                                    <button class="response-button">Editar</button>
+                                                </div>
+                                            </div>
+                                            <div class="comment-message p-2">subcomment.Message</div>
+                                        </div>
+                                        <div class="subcomment">
+                                            <div class="comment-header bg-secondary text-white p-2">
+                                                <div>
+                                                    <span class="card-title mb-0">subcomment.User</span>
+                                                    <span class="comment-date">subcomment.GetDate()</span>
+                                                </div>
+                                                <div class="button-container">
+                                                    <button class="response-button">Borrar</button>
+                                                    <button class="response-button">Editar</button>
+                                                </div>
+                                            </div>
+                                            <div class="comment-message p-2">subcomment.Message</div>
+                                        </div>
+                                        <div class="subcomment">
+                                            <div class="comment-header bg-secondary text-white p-2">
+                                                <div>
+                                                    <span class="card-title mb-0">subcomment.User</span>
+                                                    <span class="comment-date">subcomment.GetDate()</span>
+                                                </div>
+                                                <div class="button-container">
+                                                    <button class="response-button">Borrar</button>
+                                                    <button class="response-button">Editar</button>
+                                                </div>
+                                            </div>
+                                            <div class="comment-message p-2">subcomment.Message</div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
         </div>
 
     </div>
