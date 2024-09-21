@@ -8,10 +8,18 @@ const repoVisibility = document.getElementById("repoVisibility");
 const repoTags = document.getElementById("repoTags");
 const branchSelect = document.getElementById("branchSelect");
 const branchNameInput = document.getElementById("branchNameInput");
+const controlDiv = document.getElementById("controlDiv");
 
 let repository = null;
 
-loadRepo(urlParams.get("id"));
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    loadRepo(urlParams.get("id"));    
+}, false);
+
+
+//Functions
 
 async function loadRepo(id) {
     const url = `https://localhost:7269/api/repository/public/${id}`;
@@ -25,8 +33,22 @@ async function loadRepo(id) {
 
         displayRepository(repository);
 
+        checkUserPermission(repository);
+
     } catch (error) {
         console.error(error.message);
+    }
+}
+
+function checkUserPermission(repository) {
+    let userId = sessionStorage.getItem("_UserId");
+    console.log(userId);
+    console.log(repository.userId);
+    if (repository == null) return;
+
+
+    if (repository.userId == userId) {
+        controlDiv.classList.remove("invisible");
     }
 }
 
@@ -138,5 +160,5 @@ function isAlphanumeric(text) {
 
 
 function displayBranch(branch){
-    $("#branchDiv").append(`<h1>${branch.latestCommit}: poner datos del commit o algo así</h1>`);
+    $("#branchDiv").append(`<h5>${branch.latestCommit}: poner datos del commit o algo así</h5>`);
 }
