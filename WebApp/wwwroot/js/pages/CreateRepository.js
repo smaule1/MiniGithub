@@ -19,7 +19,8 @@ submitBtn.addEventListener("click", (event) => {
     let isValid = true;
 
     //Name
-    let name = nameInput.value;
+    let name = nameInput.value;    
+    name.trim();    
     if (name == "") {
         setWarningClasses(nameInput);
         addAlert("El nombre del repositorio no puede estar vacío");
@@ -41,6 +42,7 @@ submitBtn.addEventListener("click", (event) => {
         addAlert("El nombre del branch solo debe contener caracteres alfanumericos");
         isValid = false;
     }
+    name.replaceAll(" ", "-");
 
     //Tags
     let tags = tagInput.value;
@@ -101,7 +103,7 @@ async function createRepository(name, branch, tags, visibility) {
 
 
 function isAlphanumeric(text) {
-    const alphanumericRegex = /^[a-z0-9]+$/i;
+    const alphanumericRegex = /^[a-z0-9 ]+$/i;
     return alphanumericRegex.test(text);
 }
 
