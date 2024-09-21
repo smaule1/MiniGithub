@@ -119,9 +119,10 @@ namespace ApiWeb.Services
         }
 
         public UpdateResult DeleteBranch(string id, string name)
-        {            
-            var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);                         
-            var update = Builders<Repository>.Update.PullFilter(x => x.Branches, Builders<Branch>.Filter.Eq(x => x.Name, name));
+        {
+            var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);
+            var update = Builders<Repository>.Update.PullFilter(x => x.Branches, Builders<Branch>.Filter.Eq(x => x.Name, name) &
+                                                                                 Builders<Branch>.Filter.Ne<string>(x => x.Name, "Master"));
             return repositoryCollection.UpdateOne(filter, update);
         }
 
