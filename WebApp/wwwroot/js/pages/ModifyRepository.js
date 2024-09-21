@@ -1,14 +1,45 @@
 ﻿
 const nameInput = document.getElementById("nameInput");
-const visibilityInput = document.getElementById("visibilityInput");
 const tagInput = document.getElementById("tagInput");
 const alertDiv = document.getElementById("alertDiv");
 const submitBtn = document.getElementById("submitBtn");
 
- 
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+
+const id = urlParams.get("id");
+const visibility = urlParams.get("v");
+
+let repository = null;
+
+loadRepo();
+
+async function loadRepo() {
+    const url = `https://localhost:7269/api/repository/${visibility}/${id}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        repository = await response.json();
+
+        displayRepository(repository);
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+function displayRepository(repoObject) {
+    nameInput.value = repoObject.name;    
+    tagInput.value = repoObject.tags.join(", ");        
+}
+
+
 
 submitBtn.addEventListener("click", (event) => {
-    event.preventDefault();    
+    event.preventDefault();
 
     removeWarningClasses(nameInput);
     removeWarningClasses(tagInput);
@@ -17,18 +48,18 @@ submitBtn.addEventListener("click", (event) => {
     let isValid = true;
 
     //Name
-    let name = nameInput.value;    
-    name.trim();    
+    let name = nameInput.value;
+    name.trim();
     if (name == "") {
         setWarningClasses(nameInput);
         addAlert("El nombre del repositorio no puede estar vacío");
         isValid = false;
-    }else if (!isAlphanumeric(name)) {
+    } else if (!isAlphanumeric(name)) {
         setWarningClasses(nameInput);
         addAlert("El nombre del repositorio solo debe contener caracteres alfanumericos");
         isValid = false;
     }
-    name = name.replaceAll(" ", "-");
+    name = name.replaceAll(" ", "-");    
 
     //Tags
     let tags = tagInput.value;
@@ -44,40 +75,38 @@ submitBtn.addEventListener("click", (event) => {
     } else {
         tags = [];
     }
+    
 
-    
-    let visibility = document.querySelector('input[name="visibility"]:checked').value;
-    
-        
     if (!isValid) return;
 
-    createRepository(name, tags, visibility);
-    
+    modifyRepository(name, tags);
+
 }, false);
 
 
-async function createRepository(name, tags, visibility) {        
-    const url = `https://localhost:7269/api/repository`;
+async function modifyRepository(name, tags) {
+
+    const url = `https://localhost:7269/api/repository/${id}`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     try {
         const response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify({ userId: "todo", name: name, tags: tags, visibility:visibility}),
+            method: "PUT",
+            body: JSON.stringify({ userId: repository.id, name: name, tags: tags, visibility: repository.visibility}),
             headers: myHeaders
         });
 
         if (!response.ok) {
-            let obj = await response.json()            
+            let obj = await response.json()
             if (obj.error = "Duplicate Key Error") {
                 addAlert(`Este usuario ya tiene un repositorio llamado ${name}`);
                 return;
             }
         }
 
-        window.location.pathname = "/UserPage";  
-       
+        window.location.pathname = "/UserPage"; 
+
     } catch (error) {
         console.error(error.message);
         addAlert("Ocurrió un error inesperado");
@@ -93,21 +122,21 @@ function isAlphanumeric(text) {
 }
 
 
-function setWarningClasses(element) {    
+function setWarningClasses(element) {
     element.classList.add("border-danger");
     element.classList.add("border-2");
 }
 
-function removeWarningClasses(element){    
+function removeWarningClasses(element) {
     element.classList.remove("border-danger");
     element.classList.remove("border-2");
 }
 
 function addAlert(message) {
-    text = `Advertencia: ${message}`; 
+    text = `Advertencia: ${message}`;
     alertDiv.innerHTML += `<div class="alert alert-danger row h-20" role="alert">${text}</div>`;
 }
 
-function cleanAlerts() {    
+function cleanAlerts() {
     alertDiv.innerHTML = "";
 }

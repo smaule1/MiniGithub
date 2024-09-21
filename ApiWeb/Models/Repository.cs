@@ -31,10 +31,7 @@ namespace ApiWeb.Models
         public void validateCreate()
         {
             Id = null;
-            if (Branches.IsNullOrEmpty())
-            {
-                Branches = [new Branch("Master", null)];
-            }            
+            Branches = [new Branch("Master", null)];
         }        
                 
         public bool IsBranchNameAvailable(string name)
