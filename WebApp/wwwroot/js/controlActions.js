@@ -126,7 +126,7 @@ function ControlActions() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    html: message,
+                    html: message
                 });
             }
 

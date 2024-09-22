@@ -12,6 +12,9 @@
     <title>Commits</title>
     <!-- Custom JS -->
     <script src="~/js/pages/Commits.js" defer></script>
+
+    <link rel="stylesheet" href="~/css/Commit.css" asp-append-version="true" />
+
 </head>
 <body>
     <div>
@@ -20,14 +23,14 @@
         </div>
         <div class="dropdown mb-4">
             <button id="dropdownButton" class="btn btn-outline-secondary dropdown-toggle mb-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">Master</button>
-            <ul id="dropDownBranch" class="dropdown-menu">
+            <ul id="dropDownBranch" class="dropdown-menu" aria-labelledby="dropdownButton">
                 <li><button data-commit="Master" class="dropdown-item" onclick="changeDropdown('Master')">Master</button></li>
                 <li><button class="dropdown-item" onclick="changeDropdown('Commits')">Commit</button></li>
                 <li><button class="dropdown-item" onclick="changeDropdown('Repositorios')">Repositorios</button></li>
             </ul>
         </div>
 
-        <ul id= "commitList" class="list-group list-group-flush">
+        <ul id="commitList" class="list-group list-group-flush">
         </ul>
 
         <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="mdo">Commit</button>

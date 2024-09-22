@@ -1,0 +1,26 @@
+﻿.btn-link {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+}
+
+.btn-link:hover {
+    background-color: transparent;
+}
+
+.btn-link:focus {
+    outline: none; 
+}
+
+.dropdown-toggle::after {
+    display: none; 
+}
+
+.commits {
+    border: none;
+}
+
+.commits:hover {
+    background-color: transparent;
+}

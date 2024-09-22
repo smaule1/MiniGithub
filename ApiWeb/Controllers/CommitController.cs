@@ -31,31 +31,30 @@ namespace ApiWeb.Controllers
             return Ok(repositorioDB.getAllCommits(currentBranch)); 
         }
 
-        /*
-        [HttpGet]
-        [Route("RetrieveLastVersion")]
-        public ActionResult GetLastVersion(string currentCommit)
-        {
-            return Ok(repositorioDB.GetLastVersion(currentCommit));
-        }
-        */
-        
-        
+
         [HttpGet]
         [Route("Download/{commitId}")]
         public ActionResult GetFile(string commitId)
         {
             return repositorioDB.getFiles(commitId);
         }
-        
-        
+
+        [HttpPost]
+        [Route("Create/{commitId}")]
+        public ActionResult Rollback(string commitId, int lastVersion)
+        {
+
+            repositorioDB.rollback(commitId, lastVersion);
+            return Created();
+        }
+
         [HttpPost]
         [Route("Create")]
-        public ActionResult Create(CommitRequest commitRequest)
+        public async Task<ActionResult> CreateCommit(CommitRequest commitRequest)
         {
             try
             {
-                repositorioDB.createCommit(commitRequest);
+                await repositorioDB.createCommit(commitRequest);
                 return Created();
 
             }

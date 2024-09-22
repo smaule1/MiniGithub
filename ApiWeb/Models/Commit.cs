@@ -30,6 +30,5 @@ namespace ApiWeb.Models
 
         public List<string> FileName { get; set; }
 
-
     }
 }

@@ -21,21 +21,38 @@ function changeDropdown(text) {
     commitController();
 }
 
+//Functions that does a rollback
+function rollback(commitId) {
+
+    rollbackController(commitId);
+}
+
+function rollbackController(commitId) {
+    //Necesita traer elementos guardados en el SessionStorage
+    var lastVersion = Number(sessionStorage.getItem("Version"));
+    lastVersion += 1;
+
+    console.log(lastVersion);
+
+    var data = {
+        commitId: commitId,
+        lastVersion: lastVersion
+    };
+
+    var ca = new ControlActions();
+    var service = "commit/create/" + commitId;
+
+    ca.PostToAPI(service, data, () => {
+        console.log("Contenido registrado!");
+        commitController();
+
+    });
+}
 //Listens the "click" event to create a Commit
 function createCommit() {
     $("#acceptModalButton").click(() => {
-        //registrarCommit();
         registrarCommit();
     });
-}
-
-function multipleFiles() {
-    //Necesita traer elementos guardados en el SessionStorage
-
-    var message = $("#commitMsg").val();
-    var file = document.getElementById('file').files;
-    console.log(file);
-
 }
 
 //This function create a commit
@@ -69,8 +86,6 @@ function registrarCommit() {
         console.log("Contenido registrado!");
         commitController();
 
-        // Redirige a la p�gina de "Contenido" despu�s de registrar el contenido
-        // Cambia "Contenido" a la ruta correcta de tu p�gina de contenido
     });
 }
 
@@ -96,13 +111,24 @@ function commitController() {
 
                 sessionStorage.setItem("Version", data[data.length - 1].version);
                 console.log(sessionStorage.getItem("Version"));
-                data.forEach(function (commit) {
-                    console.log(commit.fileId);
+
+                for (var i = data.length-1; i >= 0; i--) {
+                    var commit = data[i];
                     var listElement = ` 
-                                    <a id="${commit.id}" data-version="${commit.version}" href="https://localhost:7269/api/commit/download/${commit.id}" class="list-group-item list-group-item-action">${commit.message}</a>
+                                    <li class="hoverList list-group-item d-flex justify-content-between align-items-center">
+                                        <a data-version="${commit.version}" href="https://localhost:7269/api/commit/download/${commit.id}" class="commits list-group-item list-group-item-action">${commit.message}</a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <ul id="dropDownBranch" class="dropdown-menu">
+                                                <li><button data-commit="Master" class="dropdown-item" onclick="rollback('${commit.id}')">Rollback</button></li>  
+                                            </ul>
+                                        </div>  
+                                    </li>
                                     `;
                     commitList.append(listElement);
-                });
+                }
             } else {
                 sessionStorage.setItem("Version", 0);
                 commitList.append('<p>No hay commits aún.</p>');

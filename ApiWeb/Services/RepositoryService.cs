@@ -14,6 +14,7 @@ using System.IO.Compression;
 using Microsoft.CodeAnalysis;
 using System.IO;
 using Microsoft.AspNetCore.Rewrite;
+using Azure.Core;
 
 namespace ApiWeb.Services
 {
@@ -24,6 +25,7 @@ namespace ApiWeb.Services
         public readonly IMongoDatabase db;
         private readonly IDictionary<string, string> collectionNames;
         private readonly GridFSBucket _gridFS;
+        private FilterDefinitionBuilder<Commit> builder = Builders<Commit>.Filter;
 
         public RepositoryService(IOptions<MongoDBSettings> options)
         {
@@ -141,7 +143,6 @@ namespace ApiWeb.Services
         public IEnumerable<Commit> getAllCommits(string currentBranch)
         {
 
-            var builder = Builders<Commit>.Filter;
             var filter = builder.Eq(x => x.BranchName, currentBranch);
             var projection = Builders<Commit>.Projection.Expression(f => new Commit { Id = f.Id, Version = f.Version, Message = f.Message, FileId = f.FileId });
             return commitCollection.Find(filter).Project(projection).ToList();
@@ -149,45 +150,9 @@ namespace ApiWeb.Services
 
         public Commit getCommitById(string commitId)
         {
-            var builder = Builders<Commit>.Filter;
             var filter = builder.Eq(x => x.Id, commitId);
             var projection = Builders<Commit>.Projection.Expression(f => new Commit { RepoName = f.RepoName, BranchName = f.BranchName, Version = f.Version, FileId = f.FileId });
             return commitCollection.Find(filter).Project(projection).FirstOrDefault();
-        }
-
-        /*
-        public int GetLastVersion(string commitId)
-        {
-
-            var builder = Builders<Commit>.Filter;
-            var filter = builder.Eq(x => x.Id, commitId);
-            var project = Builders<Commit>.Projection.Include(f => f.Version).Exclude(f => f.Id);
-
-            var result = commitCollection.Find(filter).Project(project).FirstOrDefault();
-
-            return result != null ? result["Version"].AsInt32 : 0;
-
-        }
-        */
-
-        public FileStreamResult getStreams(ObjectId fileId)
-        {
-
-            var stream = GridFS.OpenDownloadStream(fileId);
-
-            var builder = Builders<GridFSFileInfo>.Filter;
-            var fileInfo = GridFS.Find(builder.Eq("_id", fileId)).FirstOrDefault();
-
-            var fileMetadata = fileInfo.Metadata;
-            var fileName = fileInfo.Filename;
-
-            var contentType = fileMetadata["ContentType"].AsString;
-
-            return new FileStreamResult(stream, contentType)
-            {
-                FileDownloadName = fileName
-            };
-
         }
 
         public FileStreamResult getFiles(string commitId) {
@@ -200,19 +165,18 @@ namespace ApiWeb.Services
 
             using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
             {
-                foreach (var ele in objectId.FileId)
-                {
-                    var fileResult = getStreams(ele);
-                    var stream = GridFS.OpenDownloadStreamAsync(ele);
+                foreach (var fileId in objectId.FileId) {
+                    var fileInfo = GridFS.Find(Builders<GridFSFileInfo>.Filter.Eq("_id", fileId)).FirstOrDefault();
+                    var stream = GridFS.OpenDownloadStream(fileId);
 
-                    
-                    var zipEntry = zipArchive.CreateEntry(fileResult.FileDownloadName, CompressionLevel.Optimal);
-                    using (var fileEntry = zipEntry.Open())
+                    var zipEntry = zipArchive.CreateEntry(fileInfo.Filename, CompressionLevel.Optimal);
+
+                    using (var zipEntryStream = zipEntry.Open())
                     {
-                        fileResult.FileStream.CopyTo(fileEntry);
+                        stream.CopyTo(zipEntryStream);
                     }
-                    
                 }
+
             }
 
             zipStream.Position = 0; // Reiniciar la posición para que se lea desde el principio
@@ -222,25 +186,39 @@ namespace ApiWeb.Services
             };
         }
 
-        public void createCommit(CommitRequest request)
+        public Commit copyCommit(string commitId)
+        {
+            var filter = builder.Eq(x => x.Id, commitId);
+            return commitCollection.Find(filter).FirstOrDefault();
+        }
+        public void rollback(string commitId, int lastVersion)
+        {
+
+            var commit = copyCommit(commitId);
+            commit.Id = "";
+            commit.Version = lastVersion;
+
+            // Save the commit to Mongo
+            commitCollection.InsertOne(commit);
+
+        }
+
+        private async Task<ObjectId> UploadFileAsync(IFormFile file)
+        {
+            var options = new GridFSUploadOptions
+            {
+                Metadata = new BsonDocument { { "ContentType", file.ContentType } }
+            };
+
+            return await GridFS.UploadFromStreamAsync(file.FileName, file.OpenReadStream(), options);
+        }
+
+        public async Task createCommit(CommitRequest request)
         {
             try
             {
-                List<ObjectId> fileId = new List<ObjectId>();
-                List<string> filename = new List<string>();
-
-                foreach (var ele in request.File) {
-
-                    var options = new GridFSUploadOptions
-                    {
-                        Metadata = new BsonDocument {{ "ContentType", ele.ContentType
-                        }}
-                    };
-
-                    // Upload the file to GridFS
-                    fileId.Add(GridFS.UploadFromStream(ele.FileName, ele.OpenReadStream(), options));
-                    filename.Add(ele.FileName);
-                }
+                var uploadTasks = request.File.Select(file => UploadFileAsync(file)).ToList();
+                var fileIds = await Task.WhenAll(uploadTasks);
 
 
                 // Create a new Commit object
@@ -250,15 +228,17 @@ namespace ApiWeb.Services
                     BranchName = request.BranchName,
                     Version = request.Version,
                     Message = request.Message,
-                    FileId = fileId,
-                    FileName = filename
+                    FileId = fileIds.ToList(),
+                    FileName = request.File.Select(f => f.FileName).ToList()
                 };
 
                 // Save the commit to Mongo
-                commitCollection.InsertOne(commit);
+                await commitCollection.InsertOneAsync(commit);
 
             }
-            catch (MongoWriteException) { throw; }
+            catch (MongoWriteException ex) { 
+                throw new Exception("Error al guardar el commit en la base de datos", ex); 
+            }
         }
     }
 }
