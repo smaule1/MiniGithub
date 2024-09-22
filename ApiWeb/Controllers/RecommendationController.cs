@@ -40,13 +40,15 @@ namespace ApiWeb.Controllers
         }
 
 
-        [HttpPut("{userid}, {repoid},{vis}")]
+        [HttpPut("{userid},{repoid},{vis}")]
         public async void CreateRepo(string userid, string repoid, string vis)
         {
             //esta no esta funcionando, no se porque
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
-            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u:User) WHERE u.userid = $userid CREATE (u)-[:Owner_Of]->(r:REPOSITORY {repoid: $repoid, visivility: $vis})", new { userid, repoid, vis }));
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u:User) WHERE u.userid = $userid" +
+                " MERGE (r:REPOSITORY {repoid: $repoid, visivility: $vis})" +
+                " CREATE (u)-[:Owner_Of]->(r)", new { userid, repoid, vis }));
         }
 
         [HttpDelete("repo/{repoid}")]
