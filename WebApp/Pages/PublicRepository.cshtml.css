@@ -31,7 +31,17 @@
     line-height: 1.5;
 }
 
-.response-button {
+.response-btn {
+    align-items: start;
+    border: none;
+}
+
+.delete-btn {
+    align-items: start;
+    border: none;
+}
+
+.edit-btn {
     align-items: start;
     border: none;
 }

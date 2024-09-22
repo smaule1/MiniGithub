@@ -46,7 +46,17 @@
             line-height: 1.5;
         }
 
-        .response-button {
+        .response-btn {
+            align-items: start;
+            border: none;
+        }
+
+        .delete-btn {
+            align-items: start;
+            border: none;
+        }
+
+        .edit-btn {
             align-items: start;
             border: none;
         }
@@ -129,92 +139,117 @@
             </div>
         </div>
 
-        <div class="comment-container">
-            <div class="row justify-content-center">
-                <div class="col-md-10">
-
-                    @*foreach (var comment in GetByRepoId)*@
-                        <div class="card mt-3 shadow-lg" id="2">
-                            <div class="comment-header bg-primary text-white p-3">
-                                <div>
-                                    <span class="card-title mb-0">comment.User</span>
-                                    <span class="comment-date">comment.GetDate()</span>
-                                </div>
-                                <div class="button-container">
-                                    <button class="response-button">Borrar</button>
-                                    <button class="response-button">Editar</button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="comment-message">comment.Message</div>
-                                <div class="button-container">
-                                    <button class="response-button">Responder</button>
-						        </div>
-                            <button class="subcomment-btn">Subcomments ʌ</button>
-
-						        <div class="subcomment-container">
-
-                                @*foreach (var subcomment in comment.Subcomments)*@
-                                        <div class="subcomment">
-                                            <div class="comment-header bg-secondary text-white p-2">
-                                                <div>
-                                                    <span class="card-title mb-0">subcomment.User</span>
-                                                    <span class="comment-date">subcomment.GetDate()</span>
-                                                </div>
-                                                <div class="button-container">
-                                                    <button class="response-button">Borrar</button>
-                                                    <button class="response-button">Editar</button>
-                                                </div>
-                                            </div>
-                                            <div class="comment-message p-2">subcomment.Message</div>
-                                        </div>
-                                        <div class="subcomment">
-                                            <div class="comment-header bg-secondary text-white p-2">
-                                                <div>
-                                                    <span class="card-title mb-0">subcomment.User</span>
-                                                    <span class="comment-date">subcomment.GetDate()</span>
-                                                </div>
-                                                <div class="button-container">
-                                                    <button class="response-button">Borrar</button>
-                                                    <button class="response-button">Editar</button>
-                                                </div>
-                                            </div>
-                                            <div class="comment-message p-2">subcomment.Message</div>
-                                        </div>
-                                        <div class="subcomment">
-                                            <div class="comment-header bg-secondary text-white p-2">
-                                                <div>
-                                                    <span class="card-title mb-0">subcomment.User</span>
-                                                    <span class="comment-date">subcomment.GetDate()</span>
-                                                </div>
-                                                <div class="button-container">
-                                                    <button class="response-button">Borrar</button>
-                                                    <button class="response-button">Editar</button>
-                                                </div>
-                                            </div>
-                                            <div class="comment-message p-2">subcomment.Message</div>
-                                        </div>
-                                        <div class="subcomment">
-                                            <div class="comment-header bg-secondary text-white p-2">
-                                                <div>
-                                                    <span class="card-title mb-0">subcomment.User</span>
-                                                    <span class="comment-date">subcomment.GetDate()</span>
-                                                </div>
-                                                <div class="button-container">
-                                                    <button class="response-button">Borrar</button>
-                                                    <button class="response-button">Editar</button>
-                                                </div>
-                                            </div>
-                                            <div class="comment-message p-2">subcomment.Message</div>
-                                        </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="row justify-content-center">
+			<div class="col-md-10">
+                <div class="button-container">
+                    <button class="response-btn" id="commentBtn">Comment</button>
+                </div>
+				<div class="comment-container">
+                    @*Comments generated by JS script*@
                 </div>
             </div>
         </div>
 
     </div>
+
+    <script>
+        const commentsContainer = document.getElementsByClassName("comment-container")[0];
+        let comments = null;
+
+        async function loadRepoComments(repoId) {
+            const commentsUrl = `https://localhost:7269/api/comment/GetByRepoId/${repoId}`;
+            try {
+                const commResponse = await fetch(commentsUrl);
+                if (!commResponse.ok) {
+                    throw new Error(`Response status: ${commResponse.status}`);
+                }
+                comments = await commResponse.json();
+
+                if (Array.isArray(comments)) {
+                    console.log(comments);
+                    displayComments(comments);
+                }
+
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+
+        function displayComments(commentsList) {
+            commentsContainer = "";
+            commentsList.forEach(comment => {
+                commentsContainer.innerHTML += commentFormat(comment);
+            })
+        }
+
+
+
+        function commentFormat(commentObj) {
+            let commentHTML = `<div class="card mt-3 shadow-lg" id="2">
+                                            <div class="comment-header bg-primary text-white p-3">
+                                                <div>
+                                                    <span class="card-title mb-0">${commentObj.user}</span>
+                                                    <span class="comment-date">${getDate(commentObj)}</span>
+                                                </div>
+                                                <div class="button-container">
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="comment-message">${commentObj.message}</div>
+                                                <div class="button-container">
+                                                    <button class="response-btn">Respond</button>
+                                                </div>
+                                            <button class="subcomment-btn">Subcomments ></button>
+                                                <div class="subcomment-container">`;
+
+            commentObj.subcomments.forEach(subcomment => {
+                commentHTML += subcommentFormat(subcomment);
+            });
+
+            commentHTML += `</div>
+                                </div>
+                            </div>`;
+
+            return commentHTML;
+        }
+
+        function subcommentFormat(subcommentObj) {
+            let subcommentHTML = `<div class="subcomment">
+                                                <div class="comment-header bg-secondary text-white p-2">
+                                                    <div>
+                                                        <span class="card-title mb-0">${subcommentObj.user}</span>
+                                                        <span class="comment-date">${getDate(subcommentObj)}</span>
+                                                    </div>
+                                                    <div class="button-container">
+                                                        <button class="delete-btn">Delete</button>
+                                                        <button class="edit-btn">Edit</button>
+                                                    </div>
+                                                </div>
+                                                <div class="comment-message p-2">${subcommentObj.message}</div>
+                                            </div>`;
+
+            return subcommentHTML;
+        }
+
+        function getDate(comment) {
+            let date = formatDate(comment.creationDate);
+
+            if (comment.creationDate != comment.lastDate) {
+                date += ` (Edited ${formatDate(comment.lastDate)})`;
+            }
+
+            return date;
+        }
+
+        function formatDate(date) {
+            const options = date.split(/[-T.Z]/);
+            let formatedDate = `${options[2]}/${options[1]}/${options[0]} ${options[3]}`;
+            return formatedDate;
+        }
+
+        loadRepoComments("string");
+    </script>
 </body>
 </html>
 

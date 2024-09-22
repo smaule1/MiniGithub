@@ -9,9 +9,10 @@ const repoTags = document.getElementById("repoTags");
 const branchSelect = document.getElementById("branchSelect");
 const branchNameInput = document.getElementById("branchNameInput");
 const controlDiv = document.getElementById("controlDiv");
+const multParamHeader = new Headers().append("Content-Type", "application/x-www-form-urlencoded");
 
 let repository = null;
-
+let selectedComment = null;
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -161,4 +162,97 @@ function isAlphanumeric(text) {
 
 function displayBranch(branch){
     $("#branchDiv").append(`<h5>${branch.latestCommit}: poner datos del commit o algo así</h5>`);
+}
+
+
+// Comments Functions
+
+async function loadRepoComments(repoId) {
+    const url = `https://localhost:7269/api/comment/getbyrepoid/${repoId}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        comments = await response.json();
+
+        displayComments(comments);
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+function displayComments(commentsList) {
+    commentsList.forEach(comment => {
+        commentsContainer.innerHTML += commentFormat(comment);
+    })
+}
+
+
+
+function commentFormat(commentObj) {
+    let commentHTML = `<div class="card mt-3 shadow-lg" id="2">
+                            <div class="comment-header bg-primary text-white p-3">
+                                <div>
+                                    <span class="card-title mb-0">${commentObj.user}</span>
+                                    <span class="comment-date">${getDate(commentObj)}</span>
+                                </div>
+                                <div class="button-container">
+                                    <button class="delete-btn">Delete</button>
+                                    <button class="edit-btn">Edit</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="comment-message">${commentObj.message}</div>
+                                <div class="button-container">
+                                    <button class="response-btn">Respond</button>
+                                </div>
+                            <button class="subcomment-btn">Subcomments ></button>
+                                <div class="subcomment-container">`;
+
+    commentObj.subcomments.forEach(subcomment => {
+        commentHTML += subcommentFormat(subcomment);
+    });
+
+    commentHTML += `</div>
+                </div>
+            </div>`;
+
+    return commentHTML;
+}
+
+function subcommentFormat(subcommentObj) {
+    let subcommentHTML = `<div class="subcomment">
+                                <div class="comment-header bg-secondary text-white p-2">
+                                    <div>
+                                        <span class="card-title mb-0">${subcommentObj.user}</span>
+                                        <span class="comment-date">${getDate(subcommentObj) }</span>
+                                    </div>
+                                    <div class="button-container">
+                                        <button class="delete-btn">Delete</button>
+                                        <button class="edit-btn">Edit</button>
+                                    </div>
+                                </div>
+                                <div class="comment-message p-2">${subcommentObj.message}</div>
+                            </div>`;
+
+    return subcommentHTML;
+}
+
+function getDate(comment) {
+    let date = formatDate(comment.creationDate);
+
+    if (comment.creationDate != comment.lastDate) {
+        date += ` (Edited ${formatDate(comment.lastDate)})`;
+    }
+
+    return date;
+}
+
+function formatDate(date) {
+    const options = date.split(/[-T.Z]/);
+    let formatedDate = `${options[2]}/${options[1]}/${options[0]} ${options[3]}`;
+    return formatedDate;
 }

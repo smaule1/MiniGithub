@@ -24,14 +24,14 @@ namespace ApiWeb.Controllers
 
         // GET api/<CommentController>/GetByID
         [HttpGet]
-        [Route("GetByID")]
+        [Route("GetByID/{id}")]
         public Comment GetCommentById(Guid id)
         {
             return _commentService.GetComment(id);
         }
 
         [HttpGet]
-        [Route("GetByUser")]
+        [Route("GetByUser/{user}")]
         public IEnumerable<Comment> GetCommentsByUser(string user)
         {
             List<Comment> comments = _commentService.GetComments();
@@ -68,7 +68,7 @@ namespace ApiWeb.Controllers
 
         // GET: api/<CommentController>/GetByRepoId
         [HttpGet]
-        [Route("GetByRepoId")]
+        [Route("GetByRepoId/{repoId}")]
         public IEnumerable<Comment> GetCommentsByRepoId(string repoId)
         {
             List<Comment> comments = _commentService.GetComments();
@@ -121,7 +121,7 @@ namespace ApiWeb.Controllers
 
         // DELETE api/<CommentController>/DeleteComment/5
         [HttpDelete]
-        [Route("DeleteComment")]
+        [Route("DeleteComment/{id}")]
         public IActionResult DeleteComment(Guid id)
         {
             try
@@ -138,7 +138,7 @@ namespace ApiWeb.Controllers
 
         // POST api/<CommentController>/InsertSubcomment/5
         [HttpPost]
-        [Route("InsertSubcomment")]
+        [Route("{idComment}/InsertSubcomment")]
         public IActionResult InsertSubcomment(Guid idComment, [FromBody] Subcomment subcomment)
         {
             try
@@ -157,7 +157,7 @@ namespace ApiWeb.Controllers
 
         // DELETE api/<CommentController>/UpdateSubcomment/5
         [HttpPut]
-        [Route("UpdateSubcomment")]
+        [Route("{idComment}/UpdateSubcomment")]
         public IActionResult Subcomment(Guid idComment, string message, DateTimeOffset last_date, [FromBody] Subcomment antSubcomment)
         {
             try
@@ -181,7 +181,7 @@ namespace ApiWeb.Controllers
 
         // DELETE api/<CommentController>/DeleteSubcomment/5
         [HttpDelete]
-        [Route("DeleteSubcomment")]
+        [Route("{idComment}/DeleteSubcomment")]
         public IActionResult DeleteSubcomment(Guid idComment, [FromBody] Subcomment antSubcomment)
         {
             try
