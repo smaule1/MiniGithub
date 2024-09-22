@@ -59,7 +59,8 @@ submitBtn.addEventListener("click", (event) => {
         addAlert("El nombre del repositorio solo debe contener caracteres alfanumericos");
         isValid = false;
     }
-    name = name.replaceAll(" ", "-");    
+    name = name.replaceAll(" ", "-");
+
 
     //Tags
     let tags = tagInput.value;
@@ -117,7 +118,7 @@ async function modifyRepository(name, tags) {
 
 
 function isAlphanumeric(text) {
-    const alphanumericRegex = /^[a-z0-9 ]+$/i;
+    const alphanumericRegex = /^[a-z0-9 -]+$/i;
     return alphanumericRegex.test(text);
 }
 

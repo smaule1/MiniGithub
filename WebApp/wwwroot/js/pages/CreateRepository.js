@@ -88,7 +88,7 @@ async function createRepository(name, tags, visibility) {
 
 
 function isAlphanumeric(text) {
-    const alphanumericRegex = /^[a-z0-9 ]+$/i;
+    const alphanumericRegex = /^[a-z0-9 -]+$/i;
     return alphanumericRegex.test(text);
 }
 
