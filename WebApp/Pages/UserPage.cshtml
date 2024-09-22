@@ -1,0 +1,49 @@
+﻿@page
+@model WebApp.Pages.Shared.UserPageModel
+@{
+    Layout = "_Layout";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="~/js/pages/UserPage.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row align-items-center mb-4 border-bottom border-2">
+            <h1 id="repoName" class="col-auto">Nombre de Usuario</h1>
+        </div>
+        <div class="row">
+            <div class="col-8">                
+                <div class="row col-6 mt-3 py-2">
+                    <h3>Repositorios Públicos</h3>
+                    <div id="publicList" class="list-group">
+                    </div>
+                </div>
+
+                <div class="row col-6 mt-3 py-2">
+                    <h3>Repositorios Privados</h3>
+                    <div id="privateList" class="list-group">
+                    </div>
+                </div>
+
+                <div class="row col-6 mt-3 py-2">
+                    <h3>Repositorios Suscritos</h3>
+                    <div id="privateList" class="list-group">
+                        <a href="/HomePage" class="list-group-item list-group-item-action">Not implemted yet</a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-4 border-start p-4">
+                <button id="createBtn" type="button" class="btn btn-primary w-100 m-2">Crear Nuevo Repositorio</button>                      
+            </div>
+        </div>                                    
+    </div>
+</body>
+</html>
+
