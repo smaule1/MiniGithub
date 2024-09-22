@@ -59,11 +59,16 @@ namespace ApiWeb.Services
                 DateTimeOffset creationDate = (DateTimeOffset)row[colCreationDate];
                 DateTimeOffset lastDate = (DateTimeOffset) row[colLastDate];
                 List<Subcomment> subcomments = GetSubcomments((Subcomment[]) row[colSubcomments]);
+
                 if (!subcomments.IsNullOrEmpty()) { subcomments.Sort((s1, s2) => s1.CreationDate.CompareTo(s2.CreationDate)); }
+
                 string repoId = (string)row[colRepoId];
                 Comment comment = new(id, user, message, creationDate, lastDate, subcomments, repoId);
+
                 list.Add(comment);
             }
+
+            if (!list.IsNullOrEmpty()) { list.Sort((s1, s2) => s1.CreationDate.CompareTo(s2.CreationDate));  }
 
             return list;
         }

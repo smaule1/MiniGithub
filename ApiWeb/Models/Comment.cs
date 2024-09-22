@@ -7,19 +7,20 @@ namespace ApiWeb.Models
     public class Comment
     {
         [Required]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         [Required]
-        public string User { get; set; }
+        public string User { get; set; } = string.Empty;
         [Required]
-        public string Message { get; set; }
-        public DateTimeOffset CreationDate { get; set; }
-        public DateTimeOffset LastDate { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public DateTimeOffset CreationDate { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset LastDate { get; set; } = DateTimeOffset.Now;
         [Required]
-        public List<Subcomment> Subcomments { get; set; }
+        public List<Subcomment> Subcomments { get; set; } = [];
         [Required]
-        public string RepoId { get; set; }
+        public string RepoId { get; set; } = string.Empty;
 
-        [JsonConstructor]
+        public Comment() { }
+
         public Comment(Guid id, string user, string message, DateTimeOffset creationDate, DateTimeOffset lastDate, List<Subcomment> subcomments, string repoId)
         {
             Id = id;
@@ -28,17 +29,6 @@ namespace ApiWeb.Models
             RepoId = repoId;
             CreationDate = creationDate;
             LastDate = lastDate;
-            Subcomments = GetSubcomments(subcomments);
-        }
-
-        public Comment(string user, string message, DateTimeOffset creationDate, List<Subcomment> subcomments, string repoId)
-        {
-            Id = Guid.NewGuid();
-            User = user;
-            Message = message;
-            RepoId = repoId;
-            CreationDate = creationDate;
-            LastDate = creationDate;
             Subcomments = GetSubcomments(subcomments);
         }
 

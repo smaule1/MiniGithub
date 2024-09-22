@@ -104,18 +104,22 @@ namespace ApiWeb.Controllers
 
         // PUT api/<CommentController>/UpdateComment/5
         [HttpPut]
-        [Route("UpdateComment")]
-        public IActionResult UpdateComment([FromBody] Comment comment)
+        [Route("UpdateComment/{commentId}/{message}")]
+        public IActionResult UpdateComment(Guid commentId, string message)
         {
             try
             {
+                Comment comment = _commentService.GetComment(commentId);
+                comment.LastDate = DateTime.Now;
+                comment.Message = message;
+
                 _commentService.UpdateComment(comment);
                 return Ok();
             }
             catch (Exception e)
             {
-                string message = _commentService.GetExceptionMessage(e);
-                return BadRequest(message);
+                string eMessage = _commentService.GetExceptionMessage(e);
+                return BadRequest(eMessage);
             }
         }
 
@@ -157,8 +161,8 @@ namespace ApiWeb.Controllers
 
         // DELETE api/<CommentController>/UpdateSubcomment/5
         [HttpPut]
-        [Route("{idComment}/UpdateSubcomment")]
-        public IActionResult Subcomment(Guid idComment, string message, DateTimeOffset last_date, [FromBody] Subcomment antSubcomment)
+        [Route("{idComment}/UpdateSubcomment/${message}")]
+        public IActionResult Subcomment(Guid idComment, string message, [FromBody] Subcomment antSubcomment)
         {
             try
             {
@@ -167,7 +171,7 @@ namespace ApiWeb.Controllers
                 if (subcomment != null)
                 {
                     subcomment.Message = message;
-                    subcomment.LastDate = last_date;
+                    subcomment.LastDate = DateTimeOffset.Now;
                 }
                 _commentService.UpdateComment(comment);
                 return Ok();
@@ -187,7 +191,15 @@ namespace ApiWeb.Controllers
             try
             {
                 Comment comment = _commentService.GetComment(idComment);
-                comment.Subcomments.Remove(antSubcomment);
+                foreach (Subcomment subcomment in comment.Subcomments!)
+                {
+                    if (subcomment.User.Equals(antSubcomment.User) && subcomment.Message.Equals(antSubcomment.Message))
+                    {
+                        comment.Subcomments.Remove(subcomment);
+                        break;
+                    }
+                }
+
                 _commentService.UpdateComment(comment);
                 return Ok();
             }
