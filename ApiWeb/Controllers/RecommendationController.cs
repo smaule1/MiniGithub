@@ -2,6 +2,7 @@
 using Azure.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Neo4j.Driver;
 using NuGet.Protocol.Core.Types;
 using System.Data;
 using System.Net;
@@ -21,12 +22,13 @@ namespace ApiWeb.Controllers
         }
 
         // POST api/<ValuesController>
-        [HttpPost]
-        public async Task<IActionResult> Create(string id)
+        [HttpPut("{id}")]
+        public async void CreateUser(string id="default")
         {
-             recommendationDB.AddPerson(id);
-
-            return Ok();
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("CREATE (u:User {userid: $id})", new { id }));
+            
         }
 
     }

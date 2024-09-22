@@ -25,7 +25,7 @@ namespace ApiWeb.Services
 
         public void AddRepo(string userid,string repoid, string vis)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER)" +
                 " WHERE u.userid = &userid" +
@@ -35,7 +35,7 @@ namespace ApiWeb.Services
         }
 
         public void RemovePerson(string userid) {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER)" +
                 " WHERE u.userid = &userid" +
@@ -46,7 +46,7 @@ namespace ApiWeb.Services
 
         public void RemoveRepo(string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r: REPOSITORY)" +
                 " WHERE r.repoid = &repoid" +
@@ -57,7 +57,7 @@ namespace ApiWeb.Services
 
         public void SubscribeTo(string userid, string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER)" +
                 " WHERE u.userid = &userid" + 
@@ -70,7 +70,7 @@ namespace ApiWeb.Services
 
         public void UnSubscribeTo(string userid, string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER {userid: &userid})-[s: Subscribe_To]->(r:REPOSITORY {repoid: &repoid})" +
                 " DELETE s", new { userid, repoid }));
@@ -80,7 +80,7 @@ namespace ApiWeb.Services
 
         public string GetSubscription(string userid, Task<IResultCursor> subscription)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             subscription = session.ExecuteWriteAsync(tx => {
                 var result = tx.RunAsync("MATCH (r:REPOSITORY)<-[s: Subscribe_To]-(u: USER {id: &userid})" +
@@ -97,7 +97,7 @@ namespace ApiWeb.Services
 
         public void SetLike(string userid, string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER)" +
                 " WHERE u.userid = &userid" +
@@ -110,7 +110,7 @@ namespace ApiWeb.Services
 
         public void SetDislike(string userid, string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER)" +
                 " WHERE u.userid = &userid" +
@@ -123,7 +123,7 @@ namespace ApiWeb.Services
 
         public void TaggedWith(string repoid, string tag)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r: REPOSITORY)" +
                 " WHERE r.repoid = &repoid" +
@@ -136,7 +136,7 @@ namespace ApiWeb.Services
 
         public void RemoveTag(string tag)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (t: TAG)" +
                 " WHERE t.tag = &tag" +
@@ -147,7 +147,7 @@ namespace ApiWeb.Services
 
         public void RemoveLike(string userid, string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER {userid: &userid})-[l: Like]->(r:REPOSITORY {repoid: &repoid})" +
                 " DELETE l", new { userid, repoid }));
@@ -157,7 +157,7 @@ namespace ApiWeb.Services
 
         public void RemoveDislike(string userid, string repoid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: USER {userid: &userid})-[d: Dislike]->(r:REPOSITORY {repoid: &repoid})" +
                 " DELETE d", new { userid, repoid }));
