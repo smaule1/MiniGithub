@@ -154,7 +154,7 @@ document.getElementById("deleteBranchBtn").addEventListener("click", async (e) =
 });
 
 function isAlphanumeric(text) {
-    const alphanumericRegex = /^[a-z0-9 ]+$/i;
+    const alphanumericRegex = /^[a-z0-9 -]+$/i;
     return alphanumericRegex.test(text);
 }
 
