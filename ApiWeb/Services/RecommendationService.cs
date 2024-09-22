@@ -15,7 +15,7 @@ namespace ApiWeb.Services
     {
         public void AddPerson(string userid)
         {
-            IDriver Driver = GraphDatabase.Driver(new Uri ("neo4j + s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
+            IDriver Driver = GraphDatabase.Driver(new Uri ("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "dm7ul4qcPi1XK-_hWO6NXtbcACml6dqfWGmxrgaW7EA"));
             using var session = Driver.AsyncSession();
             session.ExecuteWriteAsync(tx => tx.RunAsync("CREATE (u:User {userid: $userid})", new { userid }));
             ValueTask valueTask = session.DisposeAsync();
