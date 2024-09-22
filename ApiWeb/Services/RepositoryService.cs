@@ -10,6 +10,10 @@ using StackExchange.Redis;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.WireProtocol.Messages;
+using System.IO.Compression;
+using Microsoft.CodeAnalysis;
+using System.IO;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace ApiWeb.Services
 {
@@ -147,8 +151,8 @@ namespace ApiWeb.Services
         {
             var builder = Builders<Commit>.Filter;
             var filter = builder.Eq(x => x.Id, commitId);
-            return commitCollection.Find(filter).FirstOrDefault();
-
+            var projection = Builders<Commit>.Projection.Expression(f => new Commit { RepoName = f.RepoName, BranchName = f.BranchName, Version = f.Version, FileId = f.FileId });
+            return commitCollection.Find(filter).Project(projection).FirstOrDefault();
         }
 
         /*
@@ -166,15 +170,13 @@ namespace ApiWeb.Services
         }
         */
 
-        public ActionResult getFile(string fileId)
+        public FileStreamResult getStreams(ObjectId fileId)
         {
 
-            // Get the file from GridFS
-            var objectId = new ObjectId(fileId);
-            var stream = GridFS.OpenDownloadStream(objectId);
+            var stream = GridFS.OpenDownloadStream(fileId);
 
             var builder = Builders<GridFSFileInfo>.Filter;
-            var fileInfo = GridFS.Find(builder.Eq("_id", objectId)).toList();
+            var fileInfo = GridFS.Find(builder.Eq("_id", fileId)).FirstOrDefault();
 
             var fileMetadata = fileInfo.Metadata;
             var fileName = fileInfo.Filename;
@@ -187,7 +189,38 @@ namespace ApiWeb.Services
             };
 
         }
-        
+
+        public FileStreamResult getFiles(string commitId) {
+
+            //Get the Ids of the files
+            var objectId = getCommitById(commitId);
+
+            var zipStream = new MemoryStream();
+            //List<FileStreamResult> streams = new List<FileStreamResult>();
+
+            using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var ele in objectId.FileId)
+                {
+                    var fileResult = getStreams(ele);
+                    var stream = GridFS.OpenDownloadStreamAsync(ele);
+
+                    
+                    var zipEntry = zipArchive.CreateEntry(fileResult.FileDownloadName, CompressionLevel.Optimal);
+                    using (var fileEntry = zipEntry.Open())
+                    {
+                        fileResult.FileStream.CopyTo(fileEntry);
+                    }
+                    
+                }
+            }
+
+            zipStream.Position = 0; // Reiniciar la posición para que se lea desde el principio
+            return new FileStreamResult(zipStream, "application/zip")
+            {
+                FileDownloadName = $"{objectId.RepoName}_{objectId.BranchName}_{objectId.Version}.zip"
+            };
+        }
 
         public void createCommit(CommitRequest request)
         {

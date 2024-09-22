@@ -25,7 +25,7 @@ function changeDropdown(text) {
 function createCommit() {
     $("#acceptModalButton").click(() => {
         //registrarCommit();
-        multipleFiles();
+        registrarCommit();
     });
 }
 
@@ -55,7 +55,12 @@ function registrarCommit() {
     formData.append('branchName', sessionStorage.getItem("Branch"));
     formData.append('version', lastVersion);
     formData.append('message', message);
-    formData.append('file', file);
+
+    for (let i = 0; i < file.length; i++) {
+        formData.append('file', file[i]);
+    }
+
+    console.log(formData);
 
     var ca = new ControlActions();
     var service = "commit/create";
@@ -90,10 +95,11 @@ function commitController() {
                 console.log(selectedBranch.dataset.commit);
 
                 sessionStorage.setItem("Version", data[data.length - 1].version);
-
+                console.log(sessionStorage.getItem("Version"));
                 data.forEach(function (commit) {
+                    console.log(commit.fileId);
                     var listElement = ` 
-                                    <a id="${commit.id}" data-version="${commit.version}" href="https://localhost:7269/api/commit/download/${commit.fileId}" class="list-group-item list-group-item-action">${commit.message}</a>
+                                    <a id="${commit.id}" data-version="${commit.version}" href="https://localhost:7269/api/commit/download/${commit.id}" class="list-group-item list-group-item-action">${commit.message}</a>
                                     `;
                     commitList.append(listElement);
                 });

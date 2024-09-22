@@ -40,14 +40,15 @@ namespace ApiWeb.Controllers
         }
         */
         
+        
         [HttpGet]
-        [Route("Download/{fileId}")]
-        public ActionResult GetFile(string fileId)
+        [Route("Download/{commitId}")]
+        public ActionResult GetFile(string commitId)
         {
-            return repositorioDB.getFile(fileId);
+            return repositorioDB.getFiles(commitId);
         }
         
-
+        
         [HttpPost]
         [Route("Create")]
         public ActionResult Create(CommitRequest commitRequest)
