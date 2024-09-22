@@ -47,8 +47,9 @@ async function logIn(email, password) {
             }
         } else {
             let sessionData = await response.json();
-            sessionStorage.getItem("_User", sessionData.UserId);
-            sessionStorage.getItem("_UserName", sessionData.Name);
+            sessionStorage.setItem("_User", sessionData.userId);
+            sessionStorage.setItem("_UserName", sessionData.name);
+            sessionStorage.setItem("_SessionId", sessionData.sessionId);
             window.location.pathname = "/Homepage"; // creo que es homepage?
         }
     } catch (error) {

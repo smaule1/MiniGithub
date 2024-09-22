@@ -62,12 +62,10 @@ namespace ApiWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] string sessionId)
         {
             try
             {
-                string? sessionId = Request.Cookies["SessionId"];
-
                 if (sessionId != null)
                 {
                     if (sessionDb.VerifySession(sessionId))
@@ -93,11 +91,11 @@ namespace ApiWeb.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Delete()
+        public IActionResult Delete([FromBody] JsonElement data)
         {
             try
             {
-                string? sessionId = Request.Cookies["SessionId"];
+                var sessionId = data.GetProperty("session").GetString();
 
                 if (sessionId != null)
                 {

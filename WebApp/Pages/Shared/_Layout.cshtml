@@ -54,24 +54,33 @@
 
     <script>
         $(async function() {
-            const url = `https://localhost:7269/api/usersession`;
+            const url = new URL(`https://localhost:7269/api/usersession`);
+            var session = sessionStorage.getItem("_SessionId");
+
+            if (session == null || session == ""){
+                return;
+            }
+
+            const params = { sessionId: session };
+            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
             try {
                 const response = await fetch(url, {
-                    method: 'GET',
-                    credentials: 'include'
+                    method: 'GET'
                 });
 
                 if (!response.ok) {
                     let obj = await response.json();
                     if (obj.error == "Not Auth"){
                         if (obj.type == "Not valid") {
+                            sessionStorage.setItem("_SessionId", "");
                             $('#registro').removeClass('d-none');
                             $('#inicioSesion').removeClass('d-none');
                             $('#repositorios').addClass('d-none');
                             console.error(obj.message);
                         }
                         if (obj.type == "No session") {
+                            sessionStorage.setItem("_SessionId", "");
                             $('#registro').removeClass('d-none');
                             $('#inicioSesion').removeClass('d-none');
                             $('#repositorios').addClass('d-none');
@@ -79,6 +88,7 @@
                         }
                     }
                     if (obj.error == "Not Found") {
+                        sessionStorage.setItem("_SessionId", "");
                         $('#registro').removeClass('d-none');
                         $('#inicioSesion').removeClass('d-none');
                         $('#repositorios').addClass('d-none');
@@ -90,6 +100,7 @@
                     $('#repositorios').removeClass('d-none');
                 }
             } catch (error) {
+                sessionStorage.setItem("_SessionId", "");
                 $('#registro').removeClass('d-none');
                 $('#inicioSesion').removeClass('d-none');
                 $('#repositorios').addClass('d-none');
