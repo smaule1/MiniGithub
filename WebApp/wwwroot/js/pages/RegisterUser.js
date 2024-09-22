@@ -1,57 +1,67 @@
+﻿const nameInput = document.getElementById("Nombre");
 const emailInput = document.getElementById("Email");
 const passwordInput = document.getElementById("Password");
-const btn = document.getElementById("btnIniciarSesion");
+const confInput = document.getElementById("Conf_Password");
+const btn = document.getElementById("btnRegistrar");
 
 btn.addEventListener("click", (event) => {
     event.preventDefault();
 
+    removeWarningClasses(nameInput);
     removeWarningClasses(emailInput);
     removeWarningClasses(passwordInput);
+    removeWarningClasses(confInput);
     cleanAlerts();
 
+    let name = nameInput.value;
     let password = passwordInput.value;
     let email = emailInput.value;
+    let conf = confInput.value;
 
-    logIn(email, password);
+    if (password != conf) {
+        setWarningClasses(confInput);
+        addAlert("Both passwords must match.");
+        return;
+    }
+
+    registerUser(email, password, name);
 });
 
-async function logIn(email, password) {
-    const url = `https://localhost:7269/api/usersession`;
+async function registerUser(email, password, name) {
+    const url = `https://localhost:7269/api/usuario`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     try {
         const response = await fetch(url, {
             method: "POST",
-            body: JSON.stringify({ password: password, email: email }),
+            body: JSON.stringify({ password: password, email: email, name: name }),
             headers: myHeaders
         });
 
         if (!response.ok) {
             let obj = await response.json();
             if (obj.error == "Invalid Input") {
-                if (obj.type == "Email") {
+                if (obj.type == "nombre") {
+                    setWarningClasses(nameInput);
+                    addAlert(obj.message);
+                }
+                if (obj.type == "email") {
                     setWarningClasses(emailInput);
                     addAlert(obj.message);
                 }
-                if (obj.type == "Password") {
+                if (obj.type == "contraseña") {
                     setWarningClasses(passwordInput);
                     addAlert(obj.message);
                 }
-            }
-            if (obj.error == "Not Auth") {
-                addAlert(obj.message);
-            }
-            if (obj.error == "Not Found") {
+            } else if (obj.error == "Invalid Operation") {
+                setWarningClasses(emailInput);
                 addAlert(obj.message);
             }
         } else {
-            let sessionData = await response.json();
-            sessionStorage.setItem("_User", sessionData.userId);
-            sessionStorage.setItem("_UserName", sessionData.name);
-            sessionStorage.setItem("_SessionId", sessionData.sessionId);
-            window.location.pathname = "/Homepage"; // creo que es homepage?
+            window.location.pathname = "/Iniciosesion";
         }
+
     } catch (error) {
         console.error(error.message);
         addAlert("Ocurrió un error inesperado.");
