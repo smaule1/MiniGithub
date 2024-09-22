@@ -1,23 +1,18 @@
-.info-container {
-    overflow: auto;
-    padding-bottom: 100px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+.button-container {
+    text-align: right;
+    margin-bottom: 20px
+}
+
+.comment-btn {
+    align-items: start;
+    border: none;
 }
 
 .comment-container {
-    margin-bottom: 60px;
+    margin-bottom: 10px;
     position: relative;
     z-index: 1;
     flex: 1;
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .comment-date {
@@ -26,14 +21,20 @@
     display: block;
 }
 
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .comment-message {
     font-size: 1rem;
     line-height: 1.5;
 }
 
-.response-btn {
-    align-items: start;
-    border: none;
+.confirm-container {
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .delete-btn {
@@ -46,12 +47,22 @@
     border: none;
 }
 
-.button-container {
-    text-align: right;
+.info-container {
+    overflow: auto;
+    padding-bottom: 100px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.subcomment-container {
-    display: block;
+.input-comment {
+    margin-top: 20px;
+}
+
+.response-btn {
+    align-items: start;
+    border: none;
 }
 
 .subcomment {
@@ -61,7 +72,7 @@
     margin-top: 0.5rem;
 }
 
-.subcomment-btn {
+.show-subcomment-btn {
     width: 100%;
     background-color: transparent;
     border: none;
@@ -69,5 +80,9 @@
     padding: 10px;
     cursor: pointer;
     text-align: left;
+    display: block;
+}
+
+.subcomment-container {
     display: block;
 }

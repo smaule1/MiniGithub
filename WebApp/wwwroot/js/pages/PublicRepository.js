@@ -10,9 +10,14 @@ const branchSelect = document.getElementById("branchSelect");
 const branchNameInput = document.getElementById("branchNameInput");
 const controlDiv = document.getElementById("controlDiv");
 const multParamHeader = new Headers().append("Content-Type", "application/x-www-form-urlencoded");
+const commentsContainer = document.getElementsByClassName("comment-container")[0];
+const commentBtnContainer = document.getElementById("commentBtnContainer");
+const confirmBtnContainer = document.getElementById("confirmBtnContainer");
 
 let repository = null;
 let selectedComment = null;
+let commentsBase = null;
+let comments = null;
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -168,75 +173,174 @@ function displayBranch(branch){
 // Comments Functions
 
 async function loadRepoComments(repoId) {
-    const url = `https://localhost:7269/api/comment/getbyrepoid/${repoId}`;
+    const commentsUrl = `https://localhost:7269/api/comment/GetByRepoId/${repoId}`;
+
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+        const commResponse = await fetch(commentsUrl);
+
+        if (!commResponse.ok) {
+            throw new Error(`Response status: ${commResponse.status}`);
         }
 
-        comments = await response.json();
+        comments = await commResponse.json();
 
-        displayComments(comments);
+        if (Array.isArray(comments)) {
+            displayComments(comments);
+        }
 
     } catch (error) {
         console.error(error.message);
     }
 }
 
+async function insertComment(commentMessage) {
+    const commentsUrl = `https://localhost:7269/api/comment/InsertComment`;
+
+    try {
+        const commResponse = await fetch(commentsUrl, {
+            method: "POST",
+            body: JSON.stringify({
+                user: "user", // Change to userId
+                message: commentMessage,
+                repoId: "string", // Change to repoId
+                subcomments: []
+            }),
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!commResponse.ok) {
+            throw new Error(`Response status: ${commResponse.status}`);
+        }
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+async function deleteComment(commentId) {
+    const commentsUrl = `https://localhost:7269/api/comment/DeleteComment/${commentId}`;
+
+    try {
+        const commResponse = await fetch(commentsUrl, { method: "DELETE" });
+
+        if (!commResponse.ok) {
+            throw new Error(`Response status: ${commResponse.status}`);
+        }
+
+        loadRepoComments("string"); // Change to repoId
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+async function insertSubcomment(commentId, commentMessage) {
+    const commentsUrl = `https://localhost:7269/api/comment/${commentId}/InsertSubcomment`;
+
+    try {
+        const commResponse = await fetch(commentsUrl, {
+            method: "POST",
+            body: JSON.stringify({
+                user: "user", // Change to userId
+                message: commentMessage,
+            }),
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!commResponse.ok) {
+            throw new Error(`Response status: ${commResponse.status}`);
+        }
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+async function deleteSubcomment(commentId, commentMessage) {
+    const commentsUrl = `https://localhost:7269/api/comment/${commentId}/DeleteSubcomment`;
+
+    try {
+        const commResponse = await fetch(commentsUrl, {
+            method: "DELETE",
+            body: JSON.stringify({
+                user: "user", // Change to userId
+                message: commentMessage,
+            }),
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!commResponse.ok) {
+            throw new Error(`Response status: ${commResponse.status}`);
+        }
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+
 function displayComments(commentsList) {
+    let containerHTML = "";
     commentsList.forEach(comment => {
-        commentsContainer.innerHTML += commentFormat(comment);
+        containerHTML += commentFormat(comment);
     })
+
+    commentsContainer.innerHTML = containerHTML
+
+    setActions();
+
+    commentsBase = commentsContainer.innerHTML;
 }
 
 
 
 function commentFormat(commentObj) {
-    let commentHTML = `<div class="card mt-3 shadow-lg" id="2">
-                            <div class="comment-header bg-primary text-white p-3">
-                                <div>
-                                    <span class="card-title mb-0">${commentObj.user}</span>
-                                    <span class="comment-date">${getDate(commentObj)}</span>
-                                </div>
-                                <div class="button-container">
-                                    <button class="delete-btn">Delete</button>
-                                    <button class="edit-btn">Edit</button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="comment-message">${commentObj.message}</div>
-                                <div class="button-container">
-                                    <button class="response-btn">Respond</button>
-                                </div>
-                            <button class="subcomment-btn">Subcomments ></button>
-                                <div class="subcomment-container">`;
+    let commentHTML = `<div class="card mt-3 shadow-lg" id="${commentObj.id}">
+                                    <div class="comment-header bg-primary text-white p-3">
+                                        <div>
+                                            <span class="card-title mb-0">${commentObj.user}</span>
+                                            <span class="comment-date">${getDate(commentObj)}</span>
+                                        </div>
+                                        <div class="button-container">
+                                            <button class="delete-btn">Delete</button>
+                                            <button class="edit-btn">Edit</button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="comment-message">${commentObj.message}</div>
+                                        <div class="button-container">
+                                            <button class="response-btn">Responder</button>
+                                        </div>
+                                        <button class="show-subcomment-btn">Subcomentarios(${commentObj.subcomments.length}) ></button>
+                                        <div class="subcomment-container" style="display: none;" id="${commentObj.id}[subcomments]">`;
 
+    let index = 0;
     commentObj.subcomments.forEach(subcomment => {
-        commentHTML += subcommentFormat(subcomment);
+        commentHTML += subcommentFormat(subcomment, commentObj.id, index);
+        index += 1;
     });
 
     commentHTML += `</div>
-                </div>
-            </div>`;
+                                </div>
+                            </div>`;
 
     return commentHTML;
 }
 
-function subcommentFormat(subcommentObj) {
-    let subcommentHTML = `<div class="subcomment">
-                                <div class="comment-header bg-secondary text-white p-2">
-                                    <div>
-                                        <span class="card-title mb-0">${subcommentObj.user}</span>
-                                        <span class="comment-date">${getDate(subcommentObj) }</span>
-                                    </div>
-                                    <div class="button-container">
-                                        <button class="delete-btn">Delete</button>
-                                        <button class="edit-btn">Edit</button>
-                                    </div>
-                                </div>
-                                <div class="comment-message p-2">${subcommentObj.message}</div>
-                            </div>`;
+function subcommentFormat(subcommentObj, commentId, index) {
+    let subcommentHTML = `<div class="subcomment" id="${commentId}[subcomments][${index}]">
+                                        <div class="comment-header bg-secondary text-white p-2">
+                                            <div>
+                                                <span class="card-title mb-0">${subcommentObj.user}</span>
+                                                <span class="comment-date">${getDate(subcommentObj)}</span>
+                                            </div>
+                                            <div class="button-container">
+                                                <button class="delete-btn subcomment-btn">Eliminar</button>
+                                                <button class="edit-btn subcomment-btn">Editar</button>
+                                            </div>
+                                        </div>
+                                        <div class="comment-message p-2">${subcommentObj.message}</div>
+                                    </div>`;
 
     return subcommentHTML;
 }
@@ -256,3 +360,145 @@ function formatDate(date) {
     let formatedDate = `${options[2]}/${options[1]}/${options[0]} ${options[3]}`;
     return formatedDate;
 }
+
+
+
+function commentBtnAction() {
+    document.getElementById("commentBtn").addEventListener("click", function () {
+        resetCommentsView();
+        commentsContainer.innerHTML = commentsBase + `<input class="input-comment" type="text" id="writeComment" placeholder="Write your comment here"></input>`;
+        confirmBtnContainer.innerHTML = `<button class="response-btn" id="acceptBtn">Aceptar</button>
+                                                 <button class="response-btn" id="cancelBtn">Cancelar</button>`;
+
+        const inputComment = document.getElementById("writeComment");
+        inputComment.scrollIntoView({ behavior: 'smooth' });
+
+        document.getElementById("acceptBtn").addEventListener("click", async function () {
+            let message = inputComment.value;
+
+            if (!isEmptyOrSpace(message)) {
+                await insertComment(message);
+            }
+
+            updateCommentsView();
+        });
+
+        document.getElementById("cancelBtn").addEventListener("click", function () {
+            updateCommentsView();
+        });
+    });
+}
+
+function setDeleteAction() {
+    const deleteBtns = document.getElementsByClassName("delete-btn");
+    const commentDeleteBtns = Array.from(deleteBtns).filter(element =>
+        !element.classList.contains("subcomment-btn")
+    );
+    const subcommentDeleteBtns = Array.from(deleteBtns).filter(element =>
+        element.classList.contains("subcomment-btn")
+    );
+
+    commentDeleteBtns.forEach(deleteBtn => {
+        deleteBtn.addEventListener("click", async (e) => {
+            const commentId = e.currentTarget.parentNode.parentNode.parentNode.id;
+            await deleteComment(commentId);
+            loadRepoComments("string"); // Change to repoId
+        });
+    });
+
+    subcommentDeleteBtns.forEach(deleteBtn => {
+        deleteBtn.addEventListener("click", async (e) => {
+            const subcommentId = e.currentTarget.parentNode.parentNode.parentNode.id;
+            const message = document.getElementById(subcommentId).getElementsByClassName("comment-message")[0].textContent;
+            await deleteSubcomment(getCommentId(subcommentId), message);
+            loadRepoComments("string"); // Change to repoId
+        });
+    });
+}
+
+function setDisplaySubcomments() {
+    const subcomBtns = document.getElementsByClassName("show-subcomment-btn");
+
+    Array.from(subcomBtns).forEach(subcomentBtn => {
+        subcomentBtn.addEventListener("click", (e) => {
+            const subcomContainer = e.currentTarget.parentNode.getElementsByClassName("subcomment-container")[0];
+
+            if (subcomContainer.style.display == 'none') {
+                subcomContainer.style.display = `block`;
+                subcomentBtn.textContent = subcomentBtn.textContent.slice(0, -1) + "∧"
+            } else {
+                subcomContainer.style.display = 'none';
+                subcomentBtn.textContent = subcomentBtn.textContent.slice(0, -1) + ">"
+            }
+        });
+    });
+}
+
+function setRespondAction() {
+    const respondBtns = document.getElementsByClassName("response-btn");
+
+    Array.from(respondBtns).forEach(respondBtn => {
+        respondBtn.addEventListener("click", respond);
+    });
+}
+
+function respond(event) {
+    resetCommentsView();
+
+    const commentId = event.currentTarget.parentNode.parentNode.parentNode.id;
+    const subcommentsList = document.getElementById(`${commentId}[subcomments]`);
+
+    subcommentsList.innerHTML += `<input class="input-comment" type="text" id="writeComment" placeholder="Write your comment here"></input>
+                                          <div class="confirm-container" id="confirmSubcommentContainer">
+                                              <button class="response-btn" id="acceptBtn">Aceptar</button>
+                                              <button class="response-btn" id="cancelBtn">Cancelar</button>
+                                          </div>`;
+
+    const inputComment = document.getElementById("writeComment");
+    inputComment.scrollIntoView({ behavior: 'smooth' });
+
+    document.getElementById("acceptBtn").addEventListener("click", async function () {
+        let message = inputComment.value;
+
+        if (!isEmptyOrSpace(message)) {
+            await insertSubcomment(commentId, message);
+        }
+
+        updateCommentsView();
+    });
+
+    document.getElementById("cancelBtn").addEventListener("click", function () {
+        updateCommentsView();
+    });
+}
+
+
+
+function isEmptyOrSpace(string) {
+    return string.trim().length === 0;
+}
+
+function setActions() {
+    commentBtnAction();
+    setRespondAction();
+    setDeleteAction();
+    setDisplaySubcomments()
+}
+
+function resetCommentsView() {
+    commentsContainer.innerHTML = commentsBase;
+
+    setActions();
+}
+
+async function updateCommentsView() {
+    await loadRepoComments("string"); // Change to repoId
+    confirmBtnContainer.innerHTML = "";
+}
+
+function getCommentId(subcommentId) {
+    const regex = /^([^\[]+)\[subcomments\]\[(\d+)\]$/;
+    return subcommentId.match(regex)[1];
+}
+
+loadRepoComments("string");// Change to repoId
