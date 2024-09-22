@@ -73,14 +73,12 @@
                     let obj = await response.json();
                     if (obj.error == "Not Auth"){
                         if (obj.type == "Not valid") {
-                            sessionStorage.setItem("_SessionId", "");
                             $('#registro').removeClass('d-none');
                             $('#inicioSesion').removeClass('d-none');
                             $('#repositorios').addClass('d-none');
                             console.error(obj.message);
                         }
                         if (obj.type == "No session") {
-                            sessionStorage.setItem("_SessionId", "");
                             $('#registro').removeClass('d-none');
                             $('#inicioSesion').removeClass('d-none');
                             $('#repositorios').addClass('d-none');
@@ -88,12 +86,12 @@
                         }
                     }
                     if (obj.error == "Not Found") {
-                        sessionStorage.setItem("_SessionId", "");
                         $('#registro').removeClass('d-none');
                         $('#inicioSesion').removeClass('d-none');
                         $('#repositorios').addClass('d-none');
                         console.error(obj.message);
                     }
+                    sessionStorage.setItem("_SessionId", "");
                 } else {
                     $('#registro').addClass('d-none');
                     $('#inicioSesion').addClass('d-none');
