@@ -22,6 +22,7 @@ namespace ApiWeb.Services
         {
             _cluster = Cluster.Builder()
                               .AddContactPoint(options.Value.ContactPoint)
+                              .WithPort(options.Value.Port)
                               .Build();
             _session = _cluster.Connect(options.Value.Keyspace);
 

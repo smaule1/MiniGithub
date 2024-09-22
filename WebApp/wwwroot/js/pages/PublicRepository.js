@@ -500,5 +500,3 @@ function getCommentId(subcommentId) {
     const regex = /^([^\[]+)\[subcomments\]\[(\d+)\]$/;
     return subcommentId.match(regex)[1];
 }
-
-loadRepoComments("string");// Change to repoId
