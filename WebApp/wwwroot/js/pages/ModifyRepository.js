@@ -76,7 +76,12 @@ submitBtn.addEventListener("click", (event) => {
     } else {
         tags = [];
     }
-    
+
+    let userId = sessionStorage.getItem("_User");
+    if (userId == null) {
+        addAlert("Ningun usuario a iniciado sesión");
+        isValid = false;
+    }
 
     if (!isValid) return;
 

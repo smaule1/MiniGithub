@@ -37,9 +37,9 @@ async function loadRepo(id) {
 
         repository = await response.json();
 
-        displayRepository(repository);
-
         checkUserPermission(repository);
+
+        displayRepository(repository);       
 
     } catch (error) {
         console.error(error.message);
@@ -47,9 +47,7 @@ async function loadRepo(id) {
 }
 
 function checkUserPermission(repository) {
-    let userId = sessionStorage.getItem("_UserId");
-    console.log(userId);
-    console.log(repository.userId);
+    let userId = sessionStorage.getItem("_User");
     if (repository == null) return;
 
 

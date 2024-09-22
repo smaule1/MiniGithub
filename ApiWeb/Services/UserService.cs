@@ -23,7 +23,7 @@ namespace ApiWeb.Services
         static UserService()
         {
             _lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
-                ConnectionMultiplexer.Connect("localhost")
+                ConnectionMultiplexer.Connect("54.197.24.238")
             );
         }
 
@@ -58,7 +58,7 @@ namespace ApiWeb.Services
         public IEnumerable<User?> GetUsers()
         {
             var db = Connection.GetDatabase();
-            var server = db.Multiplexer.GetServer("localhost", 6379);
+            var server = db.Multiplexer.GetServer("54.197.24.238", 6379);
             var keys = server.Keys();
 
             return keys.Select(k =>

@@ -47,7 +47,13 @@ submitBtn.addEventListener("click", (event) => {
 
     
     let visibility = document.querySelector('input[name="visibility"]:checked').value;
-    
+
+    let userId = sessionStorage.getItem("_User");
+    if (userId == null) {
+        addAlert("Ningun usuario a iniciado sesión");
+        isValid = false;
+    }
+
         
     if (!isValid) return;
 
@@ -56,7 +62,7 @@ submitBtn.addEventListener("click", (event) => {
 }, false);
 
 
-async function createRepository(name, tags, visibility) {        
+async function createRepository(name, tags, visibility, userId) {        
     const url = `https://localhost:7269/api/repository`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -64,7 +70,7 @@ async function createRepository(name, tags, visibility) {
     try {
         const response = await fetch(url, {
             method: "POST",
-            body: JSON.stringify({ userId: "todo", name: name, tags: tags, visibility:visibility}),
+            body: JSON.stringify({ userId: userId, name: name, tags: tags, visibility:visibility}),
             headers: myHeaders
         });
 
