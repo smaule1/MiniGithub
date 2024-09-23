@@ -106,11 +106,8 @@ async function logout() {
     }
 }
 
-function clearSession() {
-    sessionStorage.setItem("_SessionId", null);
-    sessionStorage.setItem("_User", null);
-    sessionStorage.setItem("_UserName", null);
-    sessionStorage.setItem("_UserEmail", null);
+function clearSession() {    
+    sessionStorage.clear();
 }
 
 const nameInput = document.getElementById("newUsername");

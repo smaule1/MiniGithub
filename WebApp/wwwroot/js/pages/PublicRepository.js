@@ -41,7 +41,7 @@ async function loadRepo(id) {
 
         repository = await response.json();
 
-        checkUserPermission(repository);
+        checkUserPermission();
 
         displayRepository(repository);       
 
@@ -50,14 +50,15 @@ async function loadRepo(id) {
     }
 }
 
-function checkUserPermission(repository) {
-    let userId = sessionStorage.getItem("_User");
-    if (repository == null) return;
-
-    controlDiv.classList.remove("invisible");
-    likeBtn.classList.remove("invisible");
-    dislikeBtn.classList.remove("invisible");
-    suscribeBtn.classList.remove("invisible");            
+function checkUserPermission() {
+    let userId = sessionStorage.getItem("_User"); 
+    console.log(userId);
+    if (userId != null) {
+        controlDiv.classList.remove("invisible");
+        likeBtn.classList.remove("invisible");
+        dislikeBtn.classList.remove("invisible");
+        suscribeBtn.classList.remove("invisible");            
+    }        
 }
 
 
