@@ -4,6 +4,8 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ApiWeb.Controllers
 {
@@ -64,12 +66,12 @@ namespace ApiWeb.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(string id, [FromBody] UserUpdateDTO user)
+        [HttpPut]
+        public IActionResult Put([FromBody] UserUpdateDTO user)
         {
             try
             {
-                userDb.EditUser(id, user.Name, user.Password);
+                userDb.EditUser(user.Email, user.Name, user.Password, user.OldPassword);
                 return Ok();
             }
             catch (InvalidOperationException ex)
@@ -78,7 +80,15 @@ namespace ApiWeb.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { error = "Invalid Input", message = ex.Message, type = ex.Message.Split(' ')[1] });
+                if (ex.Message.Split(' ')[1] == "contraseña")
+                {
+                    if (ex.Message.Split(' ')[2] == "introducida")
+                    {
+                        return BadRequest(new { error = "Invalid Input", message = ex.Message, type = "Wrong Current" });
+                    }
+                    return BadRequest(new { error = "Invalid Input", message = ex.Message, type = "Wrong New" });
+                }
+                return BadRequest(new { error = "Invalid Input", message = ex.Message, type = "Nombre" });
             }
         }
 

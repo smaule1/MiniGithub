@@ -20,7 +20,7 @@ btn.addEventListener("click", (event) => {
 
     if (password != conf) {
         setWarningClasses(confInput);
-        addAlert("Both passwords must match.");
+        addAlert("Ambas constraseñas deben ser iguales.");
         return;
     }
 

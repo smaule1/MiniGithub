@@ -137,7 +137,7 @@ namespace ApiWeb.Services
             return JsonSerializer.Deserialize<User>(userString);
         }
 
-        public void EditUser(string email, string name, string password)
+        public void EditUser(string email, string name, string password, string oldPassword)
         {
             var db = Connection.GetDatabase();
 
@@ -147,40 +147,57 @@ namespace ApiWeb.Services
                 User? user = JsonSerializer.Deserialize<User>(userString);
 
                 //Validation
-                if (!isValidPassword(password) && password != user.Password)
+                if(User.HashPassword(oldPassword, email) != user.Password)
                 {
-                    throw new ValidationException("La contraseña debe cumplir con los requisitos.");
+                    throw new ValidationException("La contraseña introducida no es válida.");
                 }
-                if (!isValidName(name) && name != user.Name)
+                
+                if(name == "" && password == "")
                 {
-                    throw new ValidationException("El nombre debe cumplir con los requisitos.");
+                    throw new InvalidOperationException("Debe haber mínimo un cambio.");
+                }
+
+                if (!isValidPassword(password) && password != "")
+                {
+                    throw new ValidationException($"La contraseña debe cumplir con los requisitos:<br>" +
+                    $"1. Mínimo 8 caracteres.<br>" +
+                    $"2. Mínimo una letra mayúscula.<br>" +
+                    $"3. Mínimo una letra minúscula.<br>" +
+                    $"4. Mínimo un número.<br>" +
+                    $"5. Mínimo un caracter especial.");
+                }
+                if (!isValidName(name) && name != "")
+                {
+                    throw new ValidationException($"El nombre debe cumplir con los requisitos:<br>" +
+                    $"1. De 2 a 16 caracteres.<br>" +
+                    $"2. Solo debe contener letras, números, '-' o '_'.");
                 }
 
                 if (user != null)
                 {
                     string newUserString;
                     User newUser;
-                    if (password == user.Password && name != string.Empty)
+                    if (password != string.Empty && name != string.Empty)
                     {
-                        newUser = new User(email, user.Password, name, user.Id);
+                        newUser = new User(user.Email, password, name, user.Id, true);
                         newUserString = JsonSerializer.Serialize(newUser);
 
                         db.StringSet("user:" + email, newUserString);
-                    } else if (user.Name == name && password != string.Empty)
+                    } else if (password != string.Empty)
                     {
-                        newUser = new User(email, password, user.Name, user.Id, true);
+                        newUser = new User(user.Email, password, user.Name, user.Id, true);
                         newUserString = JsonSerializer.Serialize(newUser);
 
                         db.StringSet("user:" + email, newUserString);
-                    } else if (password != string.Empty && name != string.Empty)
+                    } else if (name != string.Empty)
                     {
-                        newUser = new User(email, password, name, user.Id, true);
+                        newUser = new User(user.Email, user.Password, name, user.Id);
                         newUserString = JsonSerializer.Serialize(newUser);
 
-                        db.StringSet("user:" + email, newUserString);
+                        db.StringSet("user:" + user.Email, newUserString);
                     } else
                     {
-                        throw new InvalidOperationException("Se inttentó actualizar con campos vacíos.");
+                        throw new InvalidOperationException("Se intentó actualizar con campos vacíos.");
                     }
                 }
                 else
