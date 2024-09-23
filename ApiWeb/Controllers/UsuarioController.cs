@@ -93,12 +93,12 @@ namespace ApiWeb.Controllers
         }
 
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        [HttpDelete]
+        public IActionResult Delete([FromQuery] string userId)
         {
             try
             {
-                userDb.DeleteUser(id);
+                userDb.DeleteUser(userId);
                 return Ok();
             }
             catch (InvalidOperationException ex)

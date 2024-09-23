@@ -8,6 +8,8 @@ const userId = sessionStorage.getItem("_User");
 
 document.getElementById("repoName").textContent = sessionStorage.getItem("_UserName");
 
+document.getElementById("repoName").textContent = sessionStorage.getItem("_UserName");
+
 getPublicRepositories(userId);
 getPrivateRepositories(userId);
 
@@ -88,7 +90,7 @@ async function logout() {
 
         if (!response.ok) {
             let obj = await response.json();
-            if (obj.message === "Not Auth" || obj.message === "Not Found") {
+            if (obj.error === "Not Auth" || obj.error === "Not Found") {
                 clearSession();
                 window.location.pathname = "/Homepage";
                 console.error(obj.message);
@@ -203,6 +205,42 @@ async function update(name, password, oldPassword) {
     }
 }
 
+document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
+    const confirmed = confirm("¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.");
+    if (confirmed) {
+        const url = new URL(`https://localhost:7269/api/usuario`);
+        var user = sessionStorage.getItem("_UserEmail");
+
+        if (user == null || user == "") {
+            console.log("No existe una sesión activa.");
+            return;
+        }
+
+        const params = { userId: user };
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                let obj = await response.json();
+                if (obj.error === "Invalid Operation" || ob.error === "Invalid Input") {
+                    addAlert2(obj.message);
+                }
+            } else {
+                logout();
+            }
+        } catch (error) {
+            addAlert2(obj.message);
+            console.error(error.message);
+        }
+    } else {
+        console.log("Eliminación de cuenta cancelada.");
+    }
+});
+
 function setWarningClasses(element) {
     element.classList.add("border-danger");
     element.classList.add("border-2");
@@ -220,4 +258,13 @@ function addAlert(message) {
 
 function cleanAlerts() {
     alertDiv.innerHTML = "";
+}
+
+function addAlert2(message) {
+    text = `Advertencia: ${message}`;
+    alertDiv2.innerHTML += `<div class="alert alert-danger row h-20" role="alert">${text}</div>`;
+}
+
+function cleanAlerts2() {
+    alertDiv2.innerHTML = "";
 }
