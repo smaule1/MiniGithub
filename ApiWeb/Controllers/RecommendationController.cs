@@ -22,7 +22,7 @@ namespace ApiWeb.Controllers
         }
 
         // POST api/<ValuesController>
-        [HttpPut("{userid}")]
+        [HttpPut("creteuser/{userid}")]
         public async void CreateUser(string userid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
@@ -31,7 +31,7 @@ namespace ApiWeb.Controllers
             
         }
 
-        [HttpDelete("user/{userid}")]
+        [HttpDelete("deleteuser/{userid}")]
         public async void DeleteUser(string userid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
@@ -40,10 +40,9 @@ namespace ApiWeb.Controllers
         }
 
 
-        [HttpPut("{userid},{repoid},{vis}")]
+        [HttpPut("createrepo/{userid},{repoid},{vis}")]
         public async void CreateRepo(string userid, string repoid, string vis)
         {
-            //esta no esta funcionando, no se porque
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u:User) WHERE u.userid = $userid" +
@@ -51,7 +50,7 @@ namespace ApiWeb.Controllers
                 " CREATE (u)-[:Owner_Of]->(r)", new { userid, repoid, vis }));
         }
 
-        [HttpDelete("repo/{repoid}")]
+        [HttpDelete("deleterepo/{repoid}")]
         public async void DeleteRepo(string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
@@ -59,6 +58,26 @@ namespace ApiWeb.Controllers
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r:REPOSITORY) WHERE r.repoid = $repoid DETACH DELETE r", new { repoid }));
         }
 
+        [HttpPut("subscribeto/{userid},{repoid}")]
+        public async void SubscribeTo(string userid, string repoid)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User)" +
+                " WHERE u.userid = $userid" +
+                " MATCH (r: REPOSITORY)" +
+                " WHERE r.repoid = $repoid" +
+                " CREATE (u)-[:Subscribe_To]->(r)", new { userid, repoid }));
+        }
+
+        [HttpDelete("unsubscribeto/{userid},{repoid}")]
+        public async void UnSubscribeTo(string userid, string repoid)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User {userid: $userid})-[s: Subscribe_To]->(r:REPOSITORY {repoid: $repoid})" +
+                " DELETE s", new { userid, repoid }));
+        }
 
     }
 }
