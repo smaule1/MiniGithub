@@ -14,12 +14,7 @@ namespace ApiWeb.Controllers
     [ApiController]
     public class RecommendationController : ControllerBase
     {
-        private readonly RecommendationService recommendationDB;
-
-        public RecommendationController(RecommendationService recommendationDB)
-        {
-            this.recommendationDB = recommendationDB;
-        }
+        
 
         // POST api/<ValuesController>
         [HttpPut("creteuser/{userid}")]
@@ -153,9 +148,7 @@ namespace ApiWeb.Controllers
                 new { userid }
             );
 
-            // Loop through the records asynchronously
             while (await reader.FetchAsync())
-            // Each current read in buffer can be reached via Current
             {
                 records.Add(reader.Current[0].ToString());
             }
@@ -175,9 +168,7 @@ namespace ApiWeb.Controllers
                 new { userid }
             );
 
-            // Loop through the records asynchronously
             while (await reader.FetchAsync())
-            // Each current read in buffer can be reached via Current
             {
                 records.Add(reader.Current[0].ToString());
             }
@@ -197,9 +188,7 @@ namespace ApiWeb.Controllers
                 new { userid }
             );
 
-            // Loop through the records asynchronously
             while (await reader.FetchAsync())
-            // Each current read in buffer can be reached via Current
             {
                 records.Add(reader.Current[0].ToString());
             }
@@ -219,14 +208,14 @@ namespace ApiWeb.Controllers
                 new { tag }
             );
 
-            // Loop through the records asynchronously
             while (await reader.FetchAsync())
-            // Each current read in buffer can be reached via Current
             {
                 records.Add(reader.Current[0].ToString());
             }
 
             return records;
         }
+
+
     }
 }
