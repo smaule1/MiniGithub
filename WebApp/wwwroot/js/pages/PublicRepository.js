@@ -342,8 +342,8 @@ function commentFormat(commentObj) {
                                         <div class="button-container">
                                             <button class="response-btn">Responder</button>
                                         </div>
-                                        <button class="show-subcomment-btn">Subcomentarios(${commentObj.subcomments.length}) ></button>
-                                        <div class="subcomment-container" style="display: none;" id="${commentObj.id}[subcomments]">`;
+                                        <button class="show-subcomment-btn">Subcomentarios(${commentObj.subcomments.length}) ∧</button>
+                                        <div class="subcomment-container" style="display: block;" id="${commentObj.id}[subcomments]">`;
 
     let index = 0;
     commentObj.subcomments.forEach(subcomment => {
