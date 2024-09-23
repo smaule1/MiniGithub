@@ -121,5 +121,25 @@ namespace ApiWeb.Controllers
                 " DELETE d", new { userid, repoid }));
         }
 
+        [HttpPut("puttag/{repoid},{tag}")]
+        public async void TaggedWith(string repoid, string tag)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r: REPOSITORY)" +
+                " WHERE r.repoid = $repoid" +
+                " MERGE (t:TAG {tag: $tag})" +
+                " MERGE (r)-[:Tagged_With]->(t)", new { repoid, tag }));
+        }
+
+        [HttpDelete("removetag/{repoid},{tag}")]
+        public async void Removetag(string repoid, string tag)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r:REPOSITORY {repoid: $repoid})-[x:Tagged_With]->(t:TAG {tag: $tag})" +
+                " DELETE x", new { repoid, tag }));
+        }
+
     }
 }
