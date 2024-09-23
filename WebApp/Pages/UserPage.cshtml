@@ -40,7 +40,37 @@
 
             </div>
             <div class="col-4 border-start p-4">
-                <button id="createBtn" type="button" class="btn btn-primary w-100 m-2">Crear Nuevo Repositorio</button>                      
+                <button id="createBtn" type="button" class="btn btn-primary w-100 m-2">Crear Nuevo Repositorio</button>
+
+                <button id="changeDetailsBtn" type="button" class="btn btn-info w-100 m-2">Cambiar Nombre de Usuario / Contraseña</button>
+
+                <div id="changeDetails" class="mt-4 d-none" style="margin-left: 15px; margin-bottom: 10px;">
+                    <h5>Cambiar Detalles</h5>
+                    <form id="changeDetailsForm">
+                        <div class="mb-3">
+                            <label for="newUsername" class="form-label">Nuevo Nombre de Usuario</label>
+                            <input type="text" id="newUsername" class="form-control" placeholder="Ingresa tu nuevo nombre de usuario">
+                        </div>
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="Ingresa tu contraseña actual">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="Ingresa tu nueva contraseña">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirma tu nueva contraseña">
+                        </div>
+                        <button type="submit" class="btn btn-info w-100">Guardar Cambios</button>
+                    </form>
+                </div>
+
+                <div id="alertDiv" style="margin-left: 15px; margin-top 15px;">
+                </div>
+
+                <button id="sessionBtn" type="button" class="btn btn-secondary w-100 m-2">Cerrar Sesión</button>
             </div>
         </div>                                    
     </div>

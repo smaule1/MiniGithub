@@ -49,15 +49,15 @@ namespace ApiWeb.Services
                         return session.SessionId;
                     } else
                     {
-                        throw new UnauthorizedAccessException("Password provided does not belong to requested email.");
+                        throw new UnauthorizedAccessException("Contraseña equivocada.");
                     }
                 } else
                 {
-                    throw new KeyNotFoundException("Error retrieving requested user.");
+                    throw new KeyNotFoundException("Error al obtener el usuario solicitado.");
                 }
             } else
             {
-                throw new KeyNotFoundException("Requested user does not exist.");
+                throw new KeyNotFoundException("El usuario solicitado no existe.");
             }
         }
 
@@ -99,7 +99,7 @@ namespace ApiWeb.Services
                 db.KeyDelete("session:" + sessionId);
             } else
             {
-                throw new KeyNotFoundException("Could not find requested session.");
+                throw new KeyNotFoundException("No se pudo encontrar la sesión solicitada.");
             }
         }
     }

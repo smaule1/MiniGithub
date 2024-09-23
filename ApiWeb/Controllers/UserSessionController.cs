@@ -91,12 +91,10 @@ namespace ApiWeb.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Delete([FromBody] JsonElement data)
+        public IActionResult Delete([FromQuery] string sessionId)
         {
             try
             {
-                var sessionId = data.GetProperty("session").GetString();
-
                 if (sessionId != null)
                 {
                     sessionDb.Logout(sessionId);
@@ -104,7 +102,7 @@ namespace ApiWeb.Controllers
                 }
                 else
                 {
-                    return Unauthorized(new { error = "Not Auth", message = "La sesión actual no es válida.", type = "No session" });
+                    return Unauthorized(new { error = "Not Auth", message = "La sesión actual no es válida." });
                 }
             }
             catch (KeyNotFoundException ex)
