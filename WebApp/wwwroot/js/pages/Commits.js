@@ -121,6 +121,11 @@ function registrarCommit() {
 //This function fetchs data from Mongo
 function commitController() {
     var currentBranch = sessionStorage.getItem("Branch");
+
+    if (currentBranch == "Master") 
+        document.getElementById("mergeButton").hidden = true;
+    else
+        document.getElementById("mergeButton").hidden = false;
     var ca = new ControlActions();
     var urlService = ca.GetUrlApiService("commit/retrieveall?currentBranch=" + currentBranch)
 

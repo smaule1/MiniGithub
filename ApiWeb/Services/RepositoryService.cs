@@ -258,17 +258,14 @@ namespace ApiWeb.Services
 
             foreach (var line in oldLines)
             {
-                if (newSet.Contains(line))
-                {
-                    result.Unchanged.Add(line);
-                }
+                result.Unchanged.Add(line);
             }
 
             foreach (var line in newLines)
             {
                 if (!oldSet.Contains(line))
                 {
-                    result.Added.Add(line);
+                    result.Added.Add($"//{line}");
                 }
             }
 
@@ -285,12 +282,12 @@ namespace ApiWeb.Services
 
             // Combine the results
             if (diff.Added.Count != 0)
-                mergedLines.Add("// REVISAR MERGE: Lineas extras añadidas al final del documento");
+                mergedLines.Add("// REVISAR MERGE: Lineas con conflicto al final del documento");
 
             mergedLines.AddRange(diff.Unchanged);
 
             if (diff.Added.Count != 0)
-                mergedLines.Add("// Revisar Merge Lineas añadidas:");
+                mergedLines.Add("// Lineas añadidas en la branch:");
 
             mergedLines.AddRange(diff.Added);
 
@@ -357,6 +354,3 @@ namespace ApiWeb.Services
         }
     }
 }
-
-
-
