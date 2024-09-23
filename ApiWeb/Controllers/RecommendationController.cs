@@ -17,44 +17,52 @@ namespace ApiWeb.Controllers
         
 
         // POST api/<ValuesController>
-        [HttpPut("creteuser/{userid}")]
-        public async void CreateUser(string userid)
+        [HttpPost("creteuser/{userid}")]
+        public async Task<OkResult> CreateUser(string userid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("CREATE (u:User {userid: $userid})", new { userid }));
 
+            return Ok();
+
         }
 
         [HttpDelete("deleteuser/{userid}")]
-        public async void DeleteUser(string userid)
+        public async Task<OkResult> DeleteUser(string userid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u:User) WHERE u.userid = $userid DETACH DELETE u", new { userid }));
+
+            return Ok();
         }
 
 
-        [HttpPut("createrepo/{userid},{repoid},{vis}")]
-        public async void CreateRepo(string userid, string repoid, string vis)
+        [HttpPost("createrepo/{userid},{repoid},{vis}")]
+        public async Task<OkResult> CreateRepo(string userid, string repoid, string vis)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u:User) WHERE u.userid = $userid" +
                 " MERGE (r:REPOSITORY {repoid: $repoid, visivility: $vis})" +
                 " CREATE (u)-[:Owner_Of]->(r)", new { userid, repoid, vis }));
+
+            return Ok();
         }
 
         [HttpDelete("deleterepo/{repoid}")]
-        public async void DeleteRepo(string repoid)
+        public async Task<OkResult> DeleteRepo(string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r:REPOSITORY) WHERE r.repoid = $repoid DETACH DELETE r", new { repoid }));
+
+            return Ok();
         }
 
-        [HttpPut("subscribeto/{userid},{repoid}")]
-        public async void SubscribeTo(string userid, string repoid)
+        [HttpPost("subscribeto/{userid},{repoid}")]
+        public async Task<OkResult> SubscribeTo(string userid, string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
@@ -63,19 +71,23 @@ namespace ApiWeb.Controllers
                 " MATCH (r: REPOSITORY)" +
                 " WHERE r.repoid = $repoid" +
                 " CREATE (u)-[:Subscribe_To]->(r)", new { userid, repoid }));
+
+            return Ok();
         }
 
         [HttpDelete("unsubscribeto/{userid},{repoid}")]
-        public async void UnSubscribeTo(string userid, string repoid)
+        public async Task<OkResult> UnSubscribeTo(string userid, string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User {userid: $userid})-[s: Subscribe_To]->(r:REPOSITORY {repoid: $repoid})" +
                 " DELETE s", new { userid, repoid }));
+
+            return Ok();
         }
 
-        [HttpPut("like/{userid},{repoid}")]
-        public async void SetLike(string userid, string repoid)
+        [HttpPost("like/{userid},{repoid}")]
+        public async Task<OkResult> SetLike(string userid, string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
@@ -84,19 +96,23 @@ namespace ApiWeb.Controllers
                 " MATCH (r: REPOSITORY)" +
                 " WHERE r.repoid = $repoid" +
                 " CREATE (u)-[:Like]->(r)", new { userid, repoid }));
+
+            return Ok();
         }
 
         [HttpDelete("removelike/{userid},{repoid}")]
-        public async void RemoveLike(string userid, string repoid)
+        public async Task<OkResult> RemoveLike(string userid, string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User {userid: $userid})-[l: Like]->(r:REPOSITORY {repoid: $repoid})" +
                 " DELETE l", new { userid, repoid }));
+
+            return Ok();
         }
 
-        [HttpPut("dislike/{userid},{repoid}")]
-        public async void SetDislike(string userid, string repoid)
+        [HttpPost("dislike/{userid},{repoid}")]
+        public async Task<OkResult> SetDislike(string userid, string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
@@ -105,19 +121,23 @@ namespace ApiWeb.Controllers
                 " MATCH (r: REPOSITORY)" +
                 " WHERE r.repoid = $repoid" +
                 " CREATE (u)-[:Dislike]->(r)", new { userid, repoid }));
+
+            return Ok();
         }
 
         [HttpDelete("removedislike/{userid},{repoid}")]
-        public async void RemoveDislike(string userid, string repoid)
+        public async Task<OkResult> RemoveDislike(string userid, string repoid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User {userid: $userid})-[d: Dislike]->(r:REPOSITORY {repoid: $repoid})" +
                 " DELETE d", new { userid, repoid }));
+
+            return Ok();
         }
 
-        [HttpPut("puttag/{repoid},{tag}")]
-        public async void TaggedWith(string repoid, string tag)
+        [HttpPost("puttag/{repoid},{tag}")]
+        public async Task<OkResult> TaggedWith(string repoid, string tag)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
@@ -125,15 +145,19 @@ namespace ApiWeb.Controllers
                 " WHERE r.repoid = $repoid" +
                 " MERGE (t:TAG {tag: $tag})" +
                 " MERGE (r)-[:Tagged_With]->(t)", new { repoid, tag }));
+
+            return Ok();
         }
 
         [HttpDelete("removetag/{repoid},{tag}")]
-        public async void Removetag(string repoid, string tag)
+        public async Task<OkResult> Removetag(string repoid, string tag)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (r:REPOSITORY {repoid: $repoid})-[x:Tagged_With]->(t:TAG {tag: $tag})" +
                 " DELETE x", new { repoid, tag }));
+
+            return Ok();
         }
 
         [HttpGet("getlikedrepos/{userid}")]
