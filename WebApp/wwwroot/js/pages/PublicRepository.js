@@ -14,6 +14,10 @@ const commentsContainer = document.getElementsByClassName("comment-container")[0
 const commentBtnContainer = document.getElementById("commentBtnContainer");
 const confirmBtnContainer = document.getElementById("confirmBtnContainer");
 
+const likeBtn = document.getElementById("likeBtn");
+const dislikeBtn = document.getElementById("dislikeBtn");
+const suscribeBtn = document.getElementById("suscribeBtn");
+
 let repository = null;
 let selectedComment = null;
 let commentsBase = null;
@@ -53,6 +57,9 @@ function checkUserPermission(repository) {
 
     if (repository.userId == userId) {
         controlDiv.classList.remove("invisible");
+        likeBtn.classList.remove("invisible");
+        dislikeBtn.classList.remove("invisible");
+        suscribeBtn.classList.remove("invisible");
     }
 }
 
