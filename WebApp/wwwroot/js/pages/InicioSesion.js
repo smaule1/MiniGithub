@@ -10,7 +10,7 @@ btn.addEventListener("click", (event) => {
     cleanAlerts();
 
     let password = passwordInput.value;
-    let email = emailInput.value;
+    let email = emailInput.value.toLowerCase();
 
     logIn(email, password);
 });
@@ -49,6 +49,7 @@ async function logIn(email, password) {
             let sessionData = await response.json();
             sessionStorage.setItem("_User", sessionData.userId);
             sessionStorage.setItem("_UserName", sessionData.name);
+            sessionStorage.setItem("_UserEmail", sessionData.email);
             sessionStorage.setItem("_SessionId", sessionData.sessionId);
             window.location.pathname = "/Homepage"; // creo que es homepage?
         }
