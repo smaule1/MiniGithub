@@ -28,7 +28,7 @@ namespace ApiWeb.Controllers
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
             using var session = Driver.AsyncSession();
             await session.ExecuteWriteAsync(tx => tx.RunAsync("CREATE (u:User {userid: $userid})", new { userid }));
-            
+
         }
 
         [HttpDelete("deleteuser/{userid}")]
@@ -150,7 +150,7 @@ namespace ApiWeb.Controllers
 
             var reader = await session.RunAsync(
                 "MATCH (u: User)-[:Like]->(r:REPOSITORY) WHERE u.userid = $userid RETURN r.repoid",
-                new { userid } 
+                new { userid }
             );
 
             // Loop through the records asynchronously
@@ -195,6 +195,28 @@ namespace ApiWeb.Controllers
             var reader = await session.RunAsync(
                 "MATCH (u: User)-[:Subscribe_To]->(r:REPOSITORY) WHERE u.userid = $userid RETURN r.repoid",
                 new { userid }
+            );
+
+            // Loop through the records asynchronously
+            while (await reader.FetchAsync())
+            // Each current read in buffer can be reached via Current
+            {
+                records.Add(reader.Current[0].ToString());
+            }
+
+            return records;
+        }
+
+        [HttpGet("getReposByTag/{tag}")]
+        public async Task<List<string>> GetReposByTag(string tag)
+        {
+            var records = new List<string>();
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            await using var session = Driver.AsyncSession();
+
+            var reader = await session.RunAsync(
+                "MATCH (r:REPOSITORY)-[:Tagged_With]->(t:TAG) WHERE t.tag = $tag RETURN r.repoid",
+                new { tag }
             );
 
             // Loop through the records asynchronously
