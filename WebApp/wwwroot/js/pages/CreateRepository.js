@@ -53,11 +53,11 @@ submitBtn.addEventListener("click", (event) => {
         addAlert("Ningun usuario a iniciado sesión");
         isValid = false;
     }
-
+    console.log(userId);
         
     if (!isValid) return;
 
-    createRepository(name, tags, visibility);
+    createRepository(name, tags, visibility, userId);
     
 }, false);
 
