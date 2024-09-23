@@ -50,6 +50,9 @@ function displayRepository(repoObject) {
     sessionStorage.setItem("RepoId", repoObject.id);
     sessionStorage.setItem("AllBranches", JSON.stringify(repoObject.branches));
     sessionStorage.setItem("RepoName", repoObject.name);
+
+    branchController();
+    commitController();
     /*
     for (let branch of branches) {
         branchSelect.innerHTML += `<option value="${branch.name}">${branch.name}</option>`;

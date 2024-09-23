@@ -200,8 +200,5 @@ function branchController() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    branchController();
     var commitCreator = new createCommit();
-    commitController();
-
 }, false);

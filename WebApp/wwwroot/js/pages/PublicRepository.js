@@ -36,11 +36,11 @@ document.addEventListener('DOMContentLoaded', function () {
 async function loadRepo(id) {
     const url = `https://localhost:7269/api/repository/public/${id}`;
     try {
-        const response = await fetch(url);
+        const response = await fetch(url)
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-
+        
         repository = await response.json();
 
         checkUserPermission();
@@ -77,6 +77,9 @@ function displayRepository(repoObject) {
     sessionStorage.setItem("RepoId", repoObject.id);
     sessionStorage.setItem("AllBranches", JSON.stringify(repoObject.branches));
     sessionStorage.setItem("RepoName", repoObject.name);
+
+    branchController();
+    commitController();
 
     /*
     for (let branch of branches) {
