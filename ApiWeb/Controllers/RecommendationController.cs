@@ -17,7 +17,7 @@ namespace ApiWeb.Controllers
         
 
         // POST api/<ValuesController>
-        [HttpPost("creteuser/{userid}")]
+        [HttpPost("createuser/{userid}")]
         public async Task<OkResult> CreateUser(string userid)
         {
             IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
@@ -240,6 +240,27 @@ namespace ApiWeb.Controllers
             return records;
         }
 
+        [HttpGet("getRecomByTags/{userid}")]
+        public async Task<List<string>> GetRecomByTags(string userid)
+        {
+            var records = new List<string>();
+            var vis = "public";
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            await using var session = Driver.AsyncSession();
+
+            var reader = await session.RunAsync(
+                "MATCH (u:User {userid: $userid})-[:Owner_Of|Subscribe_To]->(r:REPOSITORY)-[:Tagged_With]->(t:TAG)<-[:Tagged_With]-(o:REPOSITORY {visivility: $vis})" +
+                " RETURN .repoid",
+                new { userid, vis }
+            );
+
+            while (await reader.FetchAsync())
+            {
+                records.Add(reader.Current[0].ToString());
+            }
+
+            return records;
+        }
 
     }
 }
