@@ -15,6 +15,9 @@ using Microsoft.CodeAnalysis;
 using System.IO;
 using Microsoft.AspNetCore.Rewrite;
 using Azure.Core;
+using System.Text;
+using Amazon.Runtime.Internal;
+using Microsoft.Extensions.FileProviders;
 
 namespace ApiWeb.Services
 {
@@ -40,12 +43,12 @@ namespace ApiWeb.Services
             db.GetCollection<Repository>(collectionNames["Collection1"]);
 
         public void Create(Repository repository)
-        {            
+        {
             try
             {
                 repositoryCollection.InsertOne(repository);
             }
-            catch (MongoWriteException) { throw; }                      
+            catch (MongoWriteException) { throw; }
         }
 
         public UpdateResult Update(Repository repository, string id)
@@ -55,25 +58,25 @@ namespace ApiWeb.Services
                 var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);
                 var update = Builders<Repository>.Update.Set(x => x.Name, repository.Name).
                                                           Set(x => x.Tags, repository.Tags);
-                
+
                 return repositoryCollection.UpdateOne(filter, update);
             }
             catch (MongoWriteException) { throw; }
-        }        
+        }
 
         public DeleteResult Delete(string id)
         {
             var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);
-            
-            return repositoryCollection.DeleteOne(filter);                        
+
+            return repositoryCollection.DeleteOne(filter);
         }
 
         public Repository GetRepositorioById(string id, string visibilidad)
         {
             var builder = Builders<Repository>.Filter;
-            var filter = builder.Eq(x => x.Visibility, visibilidad) &  
-                         builder.Eq(x => x.Id, id);            
-            return repositoryCollection.Find(filter).FirstOrDefault();            
+            var filter = builder.Eq(x => x.Visibility, visibilidad) &
+                         builder.Eq(x => x.Id, id);
+            return repositoryCollection.Find(filter).FirstOrDefault();
         }
 
         public List<Repository> GetPublicRepositorioByName(string name)
@@ -82,7 +85,7 @@ namespace ApiWeb.Services
             var filter = builder.Regex(x => x.Name, $"/.*{name}.*/") &   //TODO: use Mongo's search index
                          builder.Eq(x => x.Visibility, "public");
             var simpleRepo = Builders<Repository>.Projection.
-                 Expression(f => new Repository { Id= f.Id, UserId = f.UserId, Name = f.Name, Visibility= f.Visibility, Tags= f.Tags});
+                 Expression(f => new Repository { Id = f.Id, UserId = f.UserId, Name = f.Name, Visibility = f.Visibility, Tags = f.Tags });
             return repositoryCollection.Find(filter).Project(simpleRepo).ToList();
         }
 
@@ -94,16 +97,16 @@ namespace ApiWeb.Services
             var simpleRepo = Builders<Repository>.Projection.
                 Expression(f => new Repository { Id = f.Id, UserId = f.UserId, Name = f.Name, Visibility = f.Visibility, Tags = f.Tags });
             return repositoryCollection.Find(filter).Project(simpleRepo).ToList();
-        }                
+        }
 
         public UpdateResult CreateBranch(string id, Branch branch)
         {
             var repositorio = GetRepositorioById(id) ?? throw new BadHttpRequestException("Repositorio not found");
             if (!repositorio.IsBranchNameAvailable(branch.Name)) throw new DuplicateNameException($"There is already a branch named '{branch.Name}' in this repository");
-            
+
             var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);
             var update = Builders<Repository>.Update.Push(x => x.Branches, branch);
-            
+
             return repositoryCollection.UpdateOne(filter, update);
 
         }
@@ -115,19 +118,20 @@ namespace ApiWeb.Services
         }
 
         public UpdateResult UpdateBranchCommit(string id, string name, string commit)
-        {            
+        {
             var builder = Builders<Repository>.Filter;
             var filter = builder.Eq(x => x.Id, id) &
                          builder.Where(x => x.Branches.Any(i => i.Name == name));
             var update = Builders<Repository>.Update.Set<string>(x => x.Branches.FirstMatchingElement().LatestCommit, commit);
-            
+
             return repositoryCollection.UpdateOne(filter, update);
         }
 
         public UpdateResult DeleteBranch(string id, string name)
-        {            
-            var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);                         
-            var update = Builders<Repository>.Update.PullFilter(x => x.Branches, Builders<Branch>.Filter.Eq(x => x.Name, name));
+        {
+            var filter = Builders<Repository>.Filter.Eq<string>(x => x.Id, id);
+            var update = Builders<Repository>.Update.PullFilter(x => x.Branches, Builders<Branch>.Filter.Eq(x => x.Name, name) &
+                                                                                 Builders<Branch>.Filter.Ne<string>(x => x.Name, "Master"));
             return repositoryCollection.UpdateOne(filter, update);
         }
 
@@ -151,11 +155,12 @@ namespace ApiWeb.Services
         public Commit getCommitById(string commitId)
         {
             var filter = builder.Eq(x => x.Id, commitId);
-            var projection = Builders<Commit>.Projection.Expression(f => new Commit { RepoName = f.RepoName, BranchName = f.BranchName, Version = f.Version, FileId = f.FileId });
+            var projection = Builders<Commit>.Projection.Expression(f => new Commit { RepoName = f.RepoName, BranchName = f.BranchName, Version = f.Version, FileId = f.FileId, FileName = f.FileName });
             return commitCollection.Find(filter).Project(projection).FirstOrDefault();
         }
 
-        public FileStreamResult getFiles(string commitId) {
+        public FileStreamResult getFiles(string commitId)
+        {
 
             //Get the Ids of the files
             var objectId = getCommitById(commitId);
@@ -165,7 +170,8 @@ namespace ApiWeb.Services
 
             using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
             {
-                foreach (var fileId in objectId.FileId) {
+                foreach (var fileId in objectId.FileId)
+                {
                     var fileInfo = GridFS.Find(Builders<GridFSFileInfo>.Filter.Eq("_id", fileId)).FirstOrDefault();
                     var stream = GridFS.OpenDownloadStream(fileId);
 
@@ -195,6 +201,7 @@ namespace ApiWeb.Services
         {
 
             var commit = copyCommit(commitId);
+
             commit.Id = "";
             commit.Version = lastVersion;
 
@@ -236,9 +243,117 @@ namespace ApiWeb.Services
                 await commitCollection.InsertOneAsync(commit);
 
             }
-            catch (MongoWriteException ex) { 
-                throw new Exception("Error al guardar el commit en la base de datos", ex); 
+            catch (MongoWriteException ex)
+            {
+                throw new Exception("Error al guardar el commit en la base de datos", ex);
             }
+        }
+
+        public MyersClass GetDiff(string[] oldLines, string[] newLines)
+        {
+            var result = new MyersClass();
+
+            var oldSet = new HashSet<string>(oldLines);
+            var newSet = new HashSet<string>(newLines);
+
+            foreach (var line in oldLines)
+            {
+                if (newSet.Contains(line))
+                {
+                    result.Unchanged.Add(line);
+                }
+            }
+
+            foreach (var line in newLines)
+            {
+                if (!oldSet.Contains(line))
+                {
+                    result.Added.Add(line);
+                }
+            }
+
+            return result;
+        }
+
+        public string dividirPalabras(string content1, string content2)
+        {
+            var linesFile1 = content1.Split('\n');
+            var linesFile2 = content2.Split('\n');
+
+            var diff = GetDiff(linesFile1, linesFile2);
+            var mergedLines = new List<string>();
+
+            // Combine the results
+            if (diff.Added.Count != 0)
+                mergedLines.Add("// REVISAR MERGE: Lineas extras añadidas al final del documento");
+
+            mergedLines.AddRange(diff.Unchanged);
+
+            if (diff.Added.Count != 0)
+                mergedLines.Add("// Revisar Merge Lineas añadidas:");
+
+            mergedLines.AddRange(diff.Added);
+
+            return string.Join('\n', mergedLines);
+
+        }
+
+        public void mergeBranches(string commitId1, string commitId2)
+        {
+
+            var commit1 = getCommitById(commitId1);
+            var commit2 = getCommitById(commitId2);
+
+            //final commit merged
+            var commit = new Commit
+            {
+                Id = "",
+                RepoName = commit1.RepoName,
+                BranchName = commit1.BranchName,
+                Version = commit1.Version + 1,
+                Message = $"{commit2.BranchName}-Merged",
+                FileId = new List<ObjectId>(),
+                FileName = new List<string>()
+            };
+
+
+            //Inserts files from master
+            for (int i = 0; i < commit1.FileId.Count; i++)
+            {
+                var index = commit2.FileName.IndexOf(commit1.FileName[i]);
+                if (index >= 0)
+                {
+                    var file1Content = GridFS.DownloadAsBytes(commit1.FileId[i]);
+                    var file2Content = GridFS.DownloadAsBytes(commit2.FileId[index]);
+
+                    string content1 = Encoding.UTF8.GetString(file1Content);
+                    string content2 = Encoding.UTF8.GetString(file2Content);
+
+                    var binary = dividirPalabras(content1, content2);
+
+                    var mergedId = GridFS.UploadFromBytes(commit1.FileName[i], Encoding.UTF8.GetBytes(binary));
+
+                    commit.FileId.Add(mergedId);
+                    commit.FileName.Add(commit1.FileName[i]);
+                } else
+                {
+                    commit.FileId.Add(commit1.FileId[i]);
+                    commit.FileName.Add(commit1.FileName[i]);
+                }
+                
+            }
+
+            //Inserts files from the merged branch
+            for (int i = 0; i < commit2.FileId.Count; i++)
+            {
+                if (!commit1.FileName.Contains(commit2.FileName[i])) { 
+                    commit.FileId.Add(commit2.FileId[i]);
+                    commit.FileName.Add(commit2.FileName[i]);
+                }
+            }
+
+            //Inserts the new commit
+            commitCollection.InsertOne(commit);
         }
     }
 }

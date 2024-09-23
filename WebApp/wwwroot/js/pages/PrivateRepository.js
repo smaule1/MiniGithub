@@ -8,21 +8,13 @@ const repoVisibility = document.getElementById("repoVisibility");
 const repoTags = document.getElementById("repoTags");
 const branchSelect = document.getElementById("branchSelect");
 const branchNameInput = document.getElementById("branchNameInput");
-const controlDiv = document.getElementById("controlDiv");
 
 let repository = null;
 
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    loadRepo(urlParams.get("id"));    
-}, false);
-
-
-//Functions
+loadRepo(urlParams.get("id"));
 
 async function loadRepo(id) {
-    const url = `https://localhost:7269/api/repository/public/${id}`;
+    const url = `https://localhost:7269/api/repository/private/${id}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -33,22 +25,8 @@ async function loadRepo(id) {
 
         displayRepository(repository);
 
-        checkUserPermission(repository);
-
     } catch (error) {
         console.error(error.message);
-    }
-}
-
-function checkUserPermission(repository) {
-    let userId = sessionStorage.getItem("_UserId");
-    console.log(userId);
-    console.log(repository.userId);
-    if (repository == null) return;
-
-
-    if (repository.userId == userId) {
-        controlDiv.classList.remove("invisible");
     }
 }
 
@@ -68,14 +46,14 @@ function displayRepository(repoObject) {
 }
 
 
-document.getElementById("modifyBtn").addEventListener("click", (e) => {
+document.getElementById("modifyBtn").addEventListener("click", (e) => { 
     window.location.href = `/ModifyRepository?id=${repository.id}&v=${repository.visibility}`;;
 });
 
 document.getElementById("deleteBtn").addEventListener("click", async (e) => {
-    const url = `https://localhost:7269/api/repository/${repository.id}`;
+    const url = `https://localhost:7269/api/repository/${repository.id}`;    
     try {
-        const response = await fetch(url, { method: "DELETE" });
+        const response = await fetch(url, {method: "DELETE"});
         if (!response.ok) {
             alert("Unexpected error");
             return;
@@ -84,8 +62,8 @@ document.getElementById("deleteBtn").addEventListener("click", async (e) => {
         window.location.pathname = "/UserPage";
 
     } catch (error) {
-        console.error(error.message);
-    }
+        console.error(error.message);        
+    }       
 });
 
 document.getElementById("createBranchBtn").addEventListener("click", async (e) => {
@@ -101,7 +79,7 @@ document.getElementById("createBranchBtn").addEventListener("click", async (e) =
             selectedBranchCommit = branch.latestCommit;
             break;
         }
-    }
+    }    
 
     if (selectedBranchCommit == null) {
         alert("No se puede crear un branch a partir de un branch sin commits");
@@ -111,10 +89,10 @@ document.getElementById("createBranchBtn").addEventListener("click", async (e) =
     //Name
     let name = branchNameInput.value;
     name.trim();
-    if (name == "") {
+    if (name == "") {              
         return;
-    } else if (!isAlphanumeric(name)) {
-        alert("El nombre del repositorio solo debe contener caracteres alfanumericos");
+    } else if (!isAlphanumeric(name)) {        
+        alert("El nombre del repositorio solo debe contener caracteres alfanumericos");        
     }
     name = name.replaceAll(" ", "-");
 
@@ -122,13 +100,13 @@ document.getElementById("createBranchBtn").addEventListener("click", async (e) =
     try {
         const response = await fetch(url, {
             method: "POST",
-            body: JSON.stringify({ name: name, latestCommit: selectedBranchCommit }),
+            body: JSON.stringify({ name:name , latestCommit:selectedBranchCommit}),
             headers: myHeaders
         });
 
         if (!response.ok) {
             let obj = await response.text();
-            alert(obj)
+            alert(obj)         
         }
         location.reload()
 
@@ -139,14 +117,14 @@ document.getElementById("createBranchBtn").addEventListener("click", async (e) =
 });
 
 document.getElementById("deleteBranchBtn").addEventListener("click", async (e) => {
-    if (branchSelect.value == "Master") { alert("El Branch Master no puede ser borrado"); return; }
+    if (branchSelect.value == "Master") { alert("El Branch Master no puede ser borrado"); return; } 
     const url = `https://localhost:7269/api/repository/${repository.id}/branch/${branchSelect.value}`;
     try {
         const response = await fetch(url, { method: "DELETE" });
         if (!response.ok) {
             alert("Unexpected error");
             return;
-        }
+        }        
     } catch (error) {
         console.error(error.message);
     }
@@ -159,6 +137,10 @@ function isAlphanumeric(text) {
 
 
 
-function displayBranch(branch){
+
+
+
+
+function displayBranch(branch) {
     $("#branchDiv").append(`<h5>${branch.latestCommit}: poner datos del commit o algo así</h5>`);
 }

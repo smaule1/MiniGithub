@@ -40,12 +40,30 @@ namespace ApiWeb.Controllers
         }
 
         [HttpPost]
-        [Route("Create/{commitId}")]
-        public ActionResult Rollback(string commitId, int lastVersion)
+        [Route("Rollback/{commitId}")]
+        public ActionResult Rollback(string commitId, [FromBody] int lastVersion)
         {
 
             repositorioDB.rollback(commitId, lastVersion);
             return Created();
+        }
+
+        [HttpPost]
+        [Route("Merge/{commitId1}")]
+        public ActionResult MergeCommit(string commitId1, [FromBody] string commitId2)
+        {
+            try
+            {
+                repositorioDB.mergeBranches(commitId1, commitId2);
+                return Created();
+
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return BadRequest("Duplicate Key Error.");
+                return BadRequest(ex.WriteError);
+            }
         }
 
         [HttpPost]

@@ -21,6 +21,38 @@ function changeDropdown(text) {
     commitController();
 }
 
+//Functions that merges the branch
+function merge() {
+    mergeController();
+}
+
+function mergeController(commitId) {
+    //Get the last commit from the current branch
+    var currentBranch = sessionStorage.getItem("Branch");
+
+    const selectedBranch = document.getElementById(currentBranch);
+    var lastCurrentCommit = selectedBranch.dataset.commit;
+
+    changeDropdown("Master");
+
+    const masterBranch = document.getElementById('Master');
+    var lastMasterCommit = masterBranch.dataset.commit;
+
+    var data = lastCurrentCommit;
+
+    var ca = new ControlActions();
+    var service = "commit/merge/" + lastMasterCommit;
+
+    console.log(lastMasterCommit);
+    console.log(lastCurrentCommit);
+
+    ca.PostToAPI(service, data, () => {
+        console.log("Contenido registrado!");
+        commitController();
+
+    });
+}
+
 //Functions that does a rollback
 function rollback(commitId) {
 
@@ -34,13 +66,10 @@ function rollbackController(commitId) {
 
     console.log(lastVersion);
 
-    var data = {
-        commitId: commitId,
-        lastVersion: lastVersion
-    };
+    var data = lastVersion;
 
     var ca = new ControlActions();
-    var service = "commit/create/" + commitId;
+    var service = "commit/rollback/" + commitId;
 
     ca.PostToAPI(service, data, () => {
         console.log("Contenido registrado!");
@@ -111,6 +140,7 @@ function commitController() {
 
                 sessionStorage.setItem("Version", data[data.length - 1].version);
                 console.log(sessionStorage.getItem("Version"));
+
 
                 for (var i = data.length-1; i >= 0; i--) {
                     var commit = data[i];

@@ -1,0 +1,56 @@
+﻿@page
+@model WebApp.Pages.CreateRepositoryModel
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="~/js/pages/CreateRepository.js" defer></script>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="row align-items-center border-bottom border-2 mb-5">
+            <h2 class="col-8 justify-content-start ">Crear Repositorio</h2>            
+        </div>
+
+        
+        <div class="row justify-content-center mb-3">
+            <div class="col-6">                                    
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Nombre del Repositorio</span>
+                    <input id="nameInput" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" >
+                </div>
+
+                <div id="visibilityInput" class="btn-group input-group mb-3" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="visibility" id="btnradio1" value="private" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">Privado</label>
+
+                    <input type="radio" class="btn-check" name="visibility" id="btnradio2" value="public">
+                    <label class="btn btn-outline-primary" for="btnradio2">Público</label>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Etiquetas</span>
+                    <input id="tagInput" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>                
+                <div class="row justify-content-end mb-3">
+                    <div class="col-3">
+                    <button id="submitBtn" class="btn btn-primary w-100" type="button">Crear</button>
+                    </div>
+                </div>                    
+                <div id="alertDiv">
+                        
+                </div>
+            </div>            
+        </div>
+
+    </div>
+
+
+</body>
+</html>
