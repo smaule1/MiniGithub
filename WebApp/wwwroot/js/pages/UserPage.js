@@ -60,3 +60,52 @@ document.getElementById("createBtn").addEventListener("click", (e) => {
     e.preventDefault();
     window.location.pathname = "/CreateRepository";
 });
+
+document.getElementById("sessionBtn").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const url = new URL(`https://localhost:7269/api/usersession`);
+    var session = sessionStorage.getItem("_SessionId");
+
+    if (session == null || session == "") {
+        console.log("No existe una sesión activa.");
+        return;
+    }
+
+    const params = { sessionId: session };
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    try {
+        const response = await fetch(url, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            let obj = await response.json();
+            if (obj.message == "Not Auth") {
+                sessionStorage.setItem("_SessionId", null);
+                sessionStorage.setItem("_User", null);
+                sessionStorage.setItem("_UserName", null);
+                window.location.pathname = "/Homepage";
+                console.error(obj.message);
+            }
+            if (obj.message == "Not Found") {
+                sessionStorage.setItem("_SessionId", null);
+                sessionStorage.setItem("_User", null);
+                sessionStorage.setItem("_UserName", null);
+                window.location.pathname = "/Homepage";
+                console.error(obj.message);
+            }
+        } else {
+            sessionStorage.setItem("_SessionId", null);
+            sessionStorage.setItem("_User", null);
+            sessionStorage.setItem("_UserName", null);
+            window.location.pathname = "/Homepage";
+        }
+    } catch (error) {
+        sessionStorage.setItem("_SessionId", null);
+        sessionStorage.setItem("_User", null);
+        sessionStorage.setItem("_UserName", null);
+        window.location.pathname = "/Homepage";
+        console.error(error.message);
+    }
+});

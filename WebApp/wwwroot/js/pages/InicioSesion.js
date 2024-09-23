@@ -10,7 +10,7 @@ btn.addEventListener("click", (event) => {
     cleanAlerts();
 
     let password = passwordInput.value;
-    let email = emailInput.value;
+    let email = emailInput.value.toLowerCase();
 
     logIn(email, password);
 });

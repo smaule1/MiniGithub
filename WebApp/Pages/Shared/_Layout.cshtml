@@ -76,14 +76,12 @@
                     let obj = await response.json();
                     if (obj.error == "Not Auth"){
                         if (obj.type == "Not valid") {
-                            console.log("Here 1");
                             document.getElementById("registro").classList.remove("d-none");
                             document.getElementById("inicioSesion").classList.remove("d-none");
                             document.getElementById("repositorios").classList.add("d-none");
                             console.error(obj.message);
                         }
                         if (obj.type == "No session") {
-                            console.log("Here 2");
                             document.getElementById("registro").classList.remove("d-none");
                             document.getElementById("inicioSesion").classList.remove("d-none");
                             document.getElementById("repositorios").classList.add("d-none");
@@ -91,7 +89,6 @@
                         }
                     }
                     if (obj.error == "Not Found") {
-                        console.log("Here 3");
                         document.getElementById("registro").classList.remove("d-none");
                         document.getElementById("inicioSesion").classList.remove("d-none");
                         document.getElementById("repositorios").classList.add("d-none");
@@ -99,13 +96,11 @@
                     }
                     sessionStorage.setItem("_SessionId", "");
                 } else {
-                    console.log("Here 4");
                     document.getElementById("registro").classList.add("d-none");
                     document.getElementById("inicioSesion").classList.add("d-none");
                     document.getElementById("repositorios").classList.remove("d-none");
                 }
             } catch (error) {
-                console.log("Here 5");
                 sessionStorage.setItem("_SessionId", "");
                 document.getElementById("registro").classList.remove("d-none");
                 document.getElementById("inicioSesion").classList.remove("d-none");
