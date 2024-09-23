@@ -54,13 +54,10 @@ function checkUserPermission(repository) {
     let userId = sessionStorage.getItem("_User");
     if (repository == null) return;
 
-
-    if (repository.userId == userId) {
-        controlDiv.classList.remove("invisible");
-        likeBtn.classList.remove("invisible");
-        dislikeBtn.classList.remove("invisible");
-        suscribeBtn.classList.remove("invisible");
-    }
+    controlDiv.classList.remove("invisible");
+    likeBtn.classList.remove("invisible");
+    dislikeBtn.classList.remove("invisible");
+    suscribeBtn.classList.remove("invisible");            
 }
 
 
@@ -149,8 +146,7 @@ document.getElementById("createBranchBtn").addEventListener("click", async (e) =
     }
 });
 
-document.getElementById("deleteBranchBtn").addEventListener("click", async (e) => {
-    if (branchSelect.value == "Master") { alert("El Branch Master no puede ser borrado"); return; }
+suscribeBtn.addEventListener("click", async (e) => {    
     const url = `https://localhost:7269/api/repository/${repository.id}/branch/${branchSelect.value}`;
     try {
         const response = await fetch(url, { method: "DELETE" });
@@ -170,9 +166,31 @@ function isAlphanumeric(text) {
 
 
 
+document.getElementById("suscribeBtn").addEventListener("click", async (e) => {
+    const url = `/api/recommendation/subscribeto/${sessionStorage.getItem("_User") },${repository.id}`;
+    try {
+        const response = await fetch(url, { method: "POST" });
+        if (!response.ok) {
+            console.log(respones);
+            alert("Unexpected error");
+            return;
+        }       
+
+    } catch (error) {
+        console.error(error.message);
+    }
+});
+
+
+
+
 function displayBranch(branch){
     $("#branchDiv").append(`<h5>${branch.latestCommit}: poner datos del commit o algo así</h5>`);
 }
+
+
+
+
 
 
 // Comments Functions

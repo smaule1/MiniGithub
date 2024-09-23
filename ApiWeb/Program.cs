@@ -40,8 +40,6 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<UserSessionService>();
 
-builder.Services.AddSingleton<RecommendationService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
