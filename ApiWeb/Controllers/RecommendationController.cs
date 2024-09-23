@@ -79,5 +79,47 @@ namespace ApiWeb.Controllers
                 " DELETE s", new { userid, repoid }));
         }
 
+        [HttpPut("like/{userid},{repoid}")]
+        public async void SetLike(string userid, string repoid)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User)" +
+                " WHERE u.userid = $userid" +
+                " MATCH (r: REPOSITORY)" +
+                " WHERE r.repoid = $repoid" +
+                " CREATE (u)-[:Like]->(r)", new { userid, repoid }));
+        }
+
+        [HttpDelete("removelike/{userid},{repoid}")]
+        public async void RemoveLike(string userid, string repoid)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User {userid: $userid})-[l: Like]->(r:REPOSITORY {repoid: $repoid})" +
+                " DELETE l", new { userid, repoid }));
+        }
+
+        [HttpPut("dislike/{userid},{repoid}")]
+        public async void SetDislike(string userid, string repoid)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User)" +
+                " WHERE u.userid = $userid" +
+                " MATCH (r: REPOSITORY)" +
+                " WHERE r.repoid = $repoid" +
+                " CREATE (u)-[:Dislike]->(r)", new { userid, repoid }));
+        }
+
+        [HttpDelete("removedislike/{userid},{repoid}")]
+        public async void RemoveDislike(string userid, string repoid)
+        {
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            using var session = Driver.AsyncSession();
+            await session.ExecuteWriteAsync(tx => tx.RunAsync("MATCH (u: User {userid: $userid})-[d: Dislike]->(r:REPOSITORY {repoid: $repoid})" +
+                " DELETE d", new { userid, repoid }));
+        }
+
     }
 }
