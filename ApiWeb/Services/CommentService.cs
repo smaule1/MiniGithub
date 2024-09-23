@@ -15,6 +15,7 @@ namespace ApiWeb.Services
         private readonly Cluster _cluster;
         [Required]
         private readonly Cassandra.ISession _session;
+
         const string colId = "id", colUser = "user", colMessage = "message", colCreationDate = "creation_date",
             colLastDate = "last_date", colSubcomments = "subcomments", colRepoId = "repo_id";
         

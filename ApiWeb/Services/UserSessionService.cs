@@ -23,7 +23,7 @@ namespace ApiWeb.Services
         static UserSessionService()
         {
             _lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
-                ConnectionMultiplexer.Connect("localhost")
+                ConnectionMultiplexer.Connect("54.197.24.238")
             );
         }
 

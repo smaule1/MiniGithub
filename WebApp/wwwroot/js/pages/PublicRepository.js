@@ -38,9 +38,9 @@ async function loadRepo(id) {
 
         repository = await response.json();
 
-        displayRepository(repository);
-
         checkUserPermission(repository);
+
+        displayRepository(repository);       
 
         await loadRepoComments(id);
 
@@ -50,9 +50,7 @@ async function loadRepo(id) {
 }
 
 function checkUserPermission(repository) {
-    let userId = sessionStorage.getItem("_UserId");
-    console.log(userId);
-    console.log(repository.userId);
+    let userId = sessionStorage.getItem("_User");
     if (repository == null) return;
 
 
@@ -305,12 +303,15 @@ function commentFormat(commentObj) {
                                         <div>
                                             <span class="card-title mb-0">${getUsername(commentObj.user)}</span>
                                             <span class="comment-date">${getDate(commentObj)}</span>
-                                        </div>
-                                        <div class="button-container">
-                                            <button class="delete-btn">Delete</button>
-                                            <button class="edit-btn">Edit</button>
-                                        </div>
-                                    </div>
+                                        </div>`;
+
+    if (subcommentObj.user == sessionStorage.getItem("_User")) {
+        subcommentHTML += `<div class="button-container">
+                                            <button class="delete-btn">Eliminar</button>
+                                        </div>`;
+    }
+
+                                    `</div>
                                     <div class="card-body">
                                         <div class="comment-message">${commentObj.message}</div>
                                         <div class="button-container">
@@ -338,12 +339,15 @@ function subcommentFormat(subcommentObj, commentId, index) {
                                     <div>
                                         <span class="card-title mb-0">${getUsername(subcommentObj.user)}</span>
                                         <span class="comment-date">${getDate(subcommentObj)}</span>
-                                    </div>
-                                    <div class="button-container">
+                                    </div>`;
+
+    if (subcommentObj.user == sessionStorage.getItem("_User")) {
+        subcommentHTML +=`<div class="button-container">
                                         <button class="delete-btn subcomment-btn">Eliminar</button>
-                                        <button class="edit-btn subcomment-btn">Editar</button>
-                                    </div>
-                                </div>
+                                    </div>`;
+    }
+                                    
+    subcommentHTML += `</div>
                                 <div class="comment-message p-2">${subcommentObj.message}</div>
                             </div>`;
 

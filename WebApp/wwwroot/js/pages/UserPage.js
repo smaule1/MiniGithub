@@ -4,7 +4,7 @@
 const publicList = document.getElementById("publicList");
 const privateList = document.getElementById("privateList");
 
-const userId = "todo";
+const userId = sessionStorage.getItem("_User");
 
 getPublicRepositories(userId);
 getPrivateRepositories(userId);
