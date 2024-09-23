@@ -223,10 +223,11 @@ async function insertComment(commentMessage) {
     const commentsUrl = `https://localhost:7269/api/comment/InsertComment`;
 
     try {
+        console.log(sessionStorage.getItem("_UserEmail"));
         const commResponse = await fetch(commentsUrl, {
             method: "POST",
             body: JSON.stringify({
-                user: sessionStorage.getItem("_User"),
+                user: sessionStorage.getItem("_UserEmail"),
                 message: commentMessage,
                 repoId: repository.id,
                 subcomments: []
@@ -267,7 +268,7 @@ async function insertSubcomment(commentId, commentMessage) {
         const commResponse = await fetch(commentsUrl, {
             method: "POST",
             body: JSON.stringify({
-                user: sessionStorage.getItem("_User"),
+                user: sessionStorage.getItem("_UserEmail"),
                 message: commentMessage,
             }),
             headers: { "Content-Type": "application/json" }
@@ -289,7 +290,7 @@ async function deleteSubcomment(commentId, commentMessage) {
         const commResponse = await fetch(commentsUrl, {
             method: "DELETE",
             body: JSON.stringify({
-                user: sessionStorage.getItem("_User"),
+                user: sessionStorage.getItem("_UserEmail"),
                 message: commentMessage,
             }),
             headers: { "Content-Type": "application/json" }
@@ -307,7 +308,6 @@ async function deleteSubcomment(commentId, commentMessage) {
 
 async function displayComments(commentsList) {
     let containerHTML = "";
-    usersList = getUsers();
 
     commentsList.forEach(comment => {
         containerHTML += commentFormat(comment);
@@ -326,17 +326,17 @@ function commentFormat(commentObj) {
     let commentHTML = `<div class="card mt-3 shadow-lg" id="${commentObj.id}">
                                     <div class="comment-header bg-primary text-white p-3">
                                         <div>
-                                            <span class="card-title mb-0">${getUsername(commentObj.user)}</span>
+                                            <span class="card-title mb-0">${commentObj.user}</span>
                                             <span class="comment-date">${getDate(commentObj)}</span>
                                         </div>`;
 
-    if (subcommentObj.user == sessionStorage.getItem("_User")) {
-        subcommentHTML += `<div class="button-container">
+    if (commentObj.user == sessionStorage.getItem("_UserEmail")) {
+        commentHTML += `<div class="button-container">
                                             <button class="delete-btn">Eliminar</button>
                                         </div>`;
     }
 
-                                    `</div>
+    commentHTML += `</div>
                                     <div class="card-body">
                                         <div class="comment-message">${commentObj.message}</div>
                                         <div class="button-container">
@@ -362,11 +362,11 @@ function subcommentFormat(subcommentObj, commentId, index) {
     let subcommentHTML = `<div class="subcomment" id="${commentId}[subcomments][${index}]">
                                 <div class="comment-header bg-secondary text-white p-2">
                                     <div>
-                                        <span class="card-title mb-0">${getUsername(subcommentObj.user)}</span>
+                                        <span class="card-title mb-0">${subcommentObj.user}</span>
                                         <span class="comment-date">${getDate(subcommentObj)}</span>
                                     </div>`;
 
-    if (subcommentObj.user == sessionStorage.getItem("_User")) {
+    if (subcommentObj.user == sessionStorage.getItem("_UserEmail")) {
         subcommentHTML +=`<div class="button-container">
                                         <button class="delete-btn subcomment-btn">Eliminar</button>
                                     </div>`;
@@ -478,15 +478,20 @@ function setRespondAction() {
 
 function respond(event) {
     resetCommentsView();
-
     const commentId = event.currentTarget.parentNode.parentNode.parentNode.id;
     const subcommentsList = document.getElementById(`${commentId}[subcomments]`);
+    const subcomentBtn = event.currentTarget.parentNode.parentNode.getElementsByClassName("show-subcomment-btn")[0];
 
     subcommentsList.innerHTML += `<input class="input-comment" type="text" id="writeComment" placeholder="Write your comment here"></input>
                                           <div class="confirm-container" id="confirmSubcommentContainer">
                                               <button class="response-btn" id="acceptBtn">Aceptar</button>
                                               <button class="response-btn" id="cancelBtn">Cancelar</button>
                                           </div>`;
+
+    if (subcommentsList.style.display == 'none') {
+        subcommentsList.style.display = `block`;
+        subcomentBtn.textContent = subcomentBtn.textContent.slice(0, -1) + "∧"
+    }
 
     const inputComment = document.getElementById("writeComment");
     inputComment.scrollIntoView({ behavior: 'smooth' });
@@ -502,7 +507,7 @@ function respond(event) {
     });
 
     document.getElementById("cancelBtn").addEventListener("click", function () {
-        updateCommentsView();
+        resetCommentsView();
     });
 }
 
@@ -535,25 +540,25 @@ function getCommentId(subcommentId) {
     return subcommentId.match(regex)[1];
 }
 
-async function getUsers() {
-    const url = `https://localhost:7269/api/usuario`;
+async function getUser(email) {
+    const url = `https://localhost:7269/api/usuario/${email}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-
-        const users = await response.json();
-        return users;
+        
+        const user = await response.json();
+        return user;
 
     } catch (error) {
         console.error(error.message);
     }
 }
 
-function getUsername(userId) {
+async function getUsername(email) {
     try {
-        const user = usersList.find(u => u.id == userId);
+        const user = await getUser(email);
         return user.name;
 
     } catch (error) {
