@@ -146,11 +146,13 @@ namespace ApiWeb.Services
 
         public IEnumerable<Commit> getAllCommits(string repositoryId, string currentBranch)
         {
+            try { 
+                var filter = builder.Eq(x => x.BranchName, currentBranch) & 
+                             builder.Eq(x => x.RepoId, repositoryId);
+                var projection = Builders<Commit>.Projection.Expression(f => new Commit { Id = f.Id, Version = f.Version, Message = f.Message, FileId = f.FileId });
+                return commitCollection.Find(filter).Project(projection).ToList();
+            } catch (MongoWriteException) { throw;}
 
-            var filter = builder.Eq(x => x.BranchName, currentBranch) & 
-                         builder.Eq(x => x.RepoId, repositoryId);
-            var projection = Builders<Commit>.Projection.Expression(f => new Commit { Id = f.Id, Version = f.Version, Message = f.Message, FileId = f.FileId });
-            return commitCollection.Find(filter).Project(projection).ToList();
         }
 
         public Commit getCommitById(string commitId)

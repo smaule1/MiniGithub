@@ -1,7 +1,6 @@
 ﻿using ApiWeb.Data;
 using ApiWeb.Models;
 using Cassandra;
-using DTOs;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;

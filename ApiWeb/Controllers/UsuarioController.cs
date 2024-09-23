@@ -1,6 +1,5 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
-using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.ComponentModel.DataAnnotations;

@@ -1,7 +1,6 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -43,8 +42,8 @@ namespace ApiWeb.Controllers
                 {
                     userComments.Add(comment);
                 }
-                else if (!comment.Subcomments.IsNullOrEmpty())
-                {
+
+
                     List<Subcomment> userSubcomments = [];
 
                     foreach (Subcomment subcomment in comment.Subcomments)
@@ -55,12 +54,10 @@ namespace ApiWeb.Controllers
                         }
                     }
 
-                    if (!userSubcomments.IsNullOrEmpty())
-                    {
+
                         comment.Subcomments = userSubcomments;
                         userComments.Add(comment);
-                    }
-                }
+
             }
 
             return userComments;

@@ -1,6 +1,5 @@
 ﻿using ApiWeb.Models;
 using ApiWeb.Services;
-using Azure.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;

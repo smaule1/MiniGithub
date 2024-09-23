@@ -185,13 +185,16 @@ function branchController() {
    
     const dropDown = $("#dropDownBranch");
     dropDown.empty();
-
-    for (var ele of currentBranch) {
-        console.log(ele.name);
-        var listElement = ` 
-                        <li><button id="${ele.name}" data-commit="" class="dropdown-item" onclick="changeDropdown('${ele.name}')">${ele.name}</button></li>
-                        `;
-        dropDown.append(listElement);
+    try { 
+        for (var ele of currentBranch) {
+            console.log(ele.name);
+            var listElement = ` 
+                            <li><button id="${ele.name}" data-commit="" class="dropdown-item" onclick="changeDropdown('${ele.name}')">${ele.name}</button></li>
+                            `;
+            dropDown.append(listElement);
+        }
+    } catch (error) {
+        console.error(error.message);
     }
   
 }
