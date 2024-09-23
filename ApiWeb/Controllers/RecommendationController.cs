@@ -162,5 +162,27 @@ namespace ApiWeb.Controllers
 
             return records;
         }
+
+        [HttpGet("getdislikedrepos/{userid}")]
+        public async Task<List<string>> GetDislikedRepos(string userid)
+        {
+            var records = new List<string>();
+            IDriver Driver = GraphDatabase.Driver(new Uri("neo4j+s://57e8bb3a.databases.neo4j.io"), AuthTokens.Basic("neo4j", "CW9aqx5BQXhFnyWt-hXoyG_ywsdp9r1TFEcUolala_c"));
+            await using var session = Driver.AsyncSession();
+
+            var reader = await session.RunAsync(
+                "MATCH (u: User)-[:Dislike]->(r:REPOSITORY) WHERE u.userid = $userid RETURN r.repoid",
+                new { userid }
+            );
+
+            // Loop through the records asynchronously
+            while (await reader.FetchAsync())
+            // Each current read in buffer can be reached via Current
+            {
+                records.Add(reader.Current[0].ToString());
+            }
+
+            return records;
+        }
     }
 }
