@@ -27,10 +27,18 @@ builder.Services.AddCors(options =>
 builder.Services.Configure<MongoDBSettings>(
 builder.Configuration.GetSection("MongoDB"));
 
+//Links the class CassandraSettings with the properties in appsetting.json
+builder.Services.Configure<CassandraSettings>(
+    builder.Configuration.GetSection("Cassandra"));
+
 //RepositorioDBContext needs to be Singleton, otherwise it crashes
 builder.Services.AddSingleton<RepositoryService>();
+builder.Services.AddSingleton<CommentService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<UserSessionService>();
 
 var app = builder.Build();
 

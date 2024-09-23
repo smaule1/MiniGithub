@@ -1,16 +1,4 @@
 ﻿sessionStorage.setItem("Branch", "Master");
-var testBranches = [
-    {
-        Name: "Master",
-        Latest_commit: "66ecf4bf1741bfca3151ed7f"
-    },
-    {
-        Name: "Commit",
-        Latest_commit: "66ed2bf9a75d4957b228bb22"
-    }
-];
-
-sessionStorage.setItem("AllBranches", JSON.stringify(testBranches));
 
 function changeDropdown(text) {
     //Se mete la branch actual dentro del storage local
@@ -95,9 +83,12 @@ function registrarCommit() {
 
     var message = $("#commitMsg").val();
     var file = document.getElementById('file').files;
-    console.log(file);
 
-    formData.append('repoName', "MiniGithub");
+    var repositoryId = sessionStorage.getItem("RepoId");
+    var repositoryName = sessionStorage.getItem("RepoName");
+
+    formData.append('repoId', repositoryId);
+    formData.append('repoName', repositoryName);
     formData.append('branchName', sessionStorage.getItem("Branch"));
     formData.append('version', lastVersion);
     formData.append('message', message);
@@ -122,12 +113,15 @@ function registrarCommit() {
 function commitController() {
     var currentBranch = sessionStorage.getItem("Branch");
 
+    var repositoryId = sessionStorage.getItem("RepoId");
+
     if (currentBranch == "Master") 
         document.getElementById("mergeButton").hidden = true;
     else
         document.getElementById("mergeButton").hidden = false;
+
     var ca = new ControlActions();
-    var urlService = ca.GetUrlApiService("commit/retrieveall?currentBranch=" + currentBranch)
+    var urlService = ca.GetUrlApiService("commit/" + repositoryId + "/retrieveall/" + currentBranch);
 
     $.ajax({
         url: urlService,
@@ -176,18 +170,20 @@ function commitController() {
 }
 
 function branchController() {
-    //var currentBranch = sessionStorage.getItem("RepoName");
+    var currentBranch = sessionStorage.getItem("RepoName");
     var currentBranch = JSON.parse(sessionStorage.getItem("AllBranches"));
-
+   
     const dropDown = $("#dropDownBranch");
     dropDown.empty();
 
     for (var ele of currentBranch) {
+        console.log(ele.name);
         var listElement = ` 
-                        <li><button id="${ele.Name}" data-commit="${ele.Latest_commit}" class="dropdown-item" onclick="changeDropdown('${ele.Name}')">${ele.Name}</button></li>
+                        <li><button id="${ele.name}" data-commit="" class="dropdown-item" onclick="changeDropdown('${ele.name}')">${ele.name}</button></li>
                         `;
         dropDown.append(listElement);
     }
+  
 }
 
 
@@ -196,10 +192,4 @@ $(document).ready(function () {
     var commitCreator = new createCommit();
     commitController();
 
-    /*
-    var usuario = sessionStorage.getItem("Usuario");
-    if (usuario == null) {
-        window.location.href = "HomePage";
-    }
-    */
 });

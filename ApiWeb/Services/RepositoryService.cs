@@ -144,10 +144,11 @@ namespace ApiWeb.Services
              db.GetCollection<Commit>(collectionNames["Collection2"]);
 
 
-        public IEnumerable<Commit> getAllCommits(string currentBranch)
+        public IEnumerable<Commit> getAllCommits(string repositoryId, string currentBranch)
         {
 
-            var filter = builder.Eq(x => x.BranchName, currentBranch);
+            var filter = builder.Eq(x => x.BranchName, currentBranch) & 
+                         builder.Eq(x => x.RepoId, repositoryId);
             var projection = Builders<Commit>.Projection.Expression(f => new Commit { Id = f.Id, Version = f.Version, Message = f.Message, FileId = f.FileId });
             return commitCollection.Find(filter).Project(projection).ToList();
         }
@@ -155,7 +156,7 @@ namespace ApiWeb.Services
         public Commit getCommitById(string commitId)
         {
             var filter = builder.Eq(x => x.Id, commitId);
-            var projection = Builders<Commit>.Projection.Expression(f => new Commit { RepoName = f.RepoName, BranchName = f.BranchName, Version = f.Version, FileId = f.FileId, FileName = f.FileName });
+            var projection = Builders<Commit>.Projection.Expression(f => new Commit { RepoId = f.RepoId, RepoName = f.RepoName, BranchName = f.BranchName, Version = f.Version, FileId = f.FileId, FileName = f.FileName });
             return commitCollection.Find(filter).Project(projection).FirstOrDefault();
         }
 
@@ -231,6 +232,7 @@ namespace ApiWeb.Services
                 // Create a new Commit object
                 var commit = new Commit
                 {
+                    RepoId = request.RepoId,
                     RepoName = request.RepoName,
                     BranchName = request.BranchName,
                     Version = request.Version,
@@ -305,6 +307,7 @@ namespace ApiWeb.Services
             var commit = new Commit
             {
                 Id = "",
+                RepoId = commit1.RepoId,
                 RepoName = commit1.RepoName,
                 BranchName = commit1.BranchName,
                 Version = commit1.Version + 1,

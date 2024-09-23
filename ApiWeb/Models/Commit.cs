@@ -15,6 +15,10 @@ namespace ApiWeb.Models
         public string? Id { get; set; }
 
         [Required]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string RepoId { get; set; }
+
+        [Required]
         public string RepoName { get; set; }
 
         [Required]
@@ -29,6 +33,7 @@ namespace ApiWeb.Models
         public List<ObjectId> FileId { get; set; }
 
         public List<string> FileName { get; set; }
+
 
     }
 }

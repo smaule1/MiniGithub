@@ -30,20 +30,19 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
+                        <li class="nav-item" id="registro">
                             <a class="nav-link text-dark" asp-area="" asp-page="/RegistroUsuario">Registro</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="inicioSesion">
                             <a class="nav-link text-dark" asp-area="" asp-page="/InicioSesion">Inicio de Sesión</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Search">Buscar</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="repositorios">
                             <a class="nav-link text-dark" asp-area="" asp-page="/UserPage">Mis Repositorios</a>
                         </li>
                     </ul>
-
                 </div>
             </div>
         </nav>
@@ -54,10 +53,66 @@
     <main role="main" class="p-4 mainDiv">
         @RenderBody()
     </main>
-   
-   
+
+
     
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        $(async function() {
+            const url = new URL(`https://localhost:7269/api/usersession`);
+            var session = sessionStorage.getItem("_SessionId");
+
+            if (session == null || session == ""){
+                return;
+            }
+
+            const params = { sessionId: session };
+            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET'
+                });
+
+                if (!response.ok) {
+                    let obj = await response.json();
+                    if (obj.error == "Not Auth"){
+                        if (obj.type == "Not valid") {
+                            $('#registro').removeClass('d-none');
+                            $('#inicioSesion').removeClass('d-none');
+                            $('#repositorios').addClass('d-none');
+                            console.error(obj.message);
+                        }
+                        if (obj.type == "No session") {
+                            $('#registro').removeClass('d-none');
+                            $('#inicioSesion').removeClass('d-none');
+                            $('#repositorios').addClass('d-none');
+                            console.error(obj.message);
+                        }
+                    }
+                    if (obj.error == "Not Found") {
+                        $('#registro').removeClass('d-none');
+                        $('#inicioSesion').removeClass('d-none');
+                        $('#repositorios').addClass('d-none');
+                        console.error(obj.message);
+                    }
+                    sessionStorage.setItem("_SessionId", "");
+                } else {
+                    $('#registro').addClass('d-none');
+                    $('#inicioSesion').addClass('d-none');
+                    $('#repositorios').removeClass('d-none');
+                }
+            } catch (error) {
+                sessionStorage.setItem("_SessionId", "");
+                $('#registro').removeClass('d-none');
+                $('#inicioSesion').removeClass('d-none');
+                $('#repositorios').addClass('d-none');
+                console.error(error.message);
+            }
+        });
+    </script>
+
 </body>
 </html>

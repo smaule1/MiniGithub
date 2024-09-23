@@ -15,6 +15,9 @@ namespace ApiWeb.Models
         public string? Id { get; set; }
 
         [Required]
+        public string RepoId { get; set; }
+
+        [Required]
         public string RepoName { get; set; }
 
         [Required]

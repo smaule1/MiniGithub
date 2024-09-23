@@ -6,7 +6,7 @@ const urlParams = new URLSearchParams(queryString);
 const repoName = document.getElementById("repoName");
 const repoVisibility = document.getElementById("repoVisibility");
 const repoTags = document.getElementById("repoTags");
-const branchSelect = document.getElementById("branchSelect");
+const branchSelect = document.getElementById("dropdownButton");
 const branchNameInput = document.getElementById("branchNameInput");
 
 let repository = null;
@@ -24,6 +24,7 @@ async function loadRepo(id) {
         repository = await response.json();
 
         displayRepository(repository);
+        console.log(repository.branches);
 
     } catch (error) {
         console.error(error.message);
@@ -38,11 +39,15 @@ function displayRepository(repoObject) {
 
     let branches = repoObject.branches;
 
-
+    sessionStorage.setItem("RepoId", repoObject.id);
+    sessionStorage.setItem("AllBranches", JSON.stringify(repoObject.branches));
+    sessionStorage.setItem("RepoName", repoObject.name);
+    /*
     for (let branch of branches) {
         branchSelect.innerHTML += `<option value="${branch.name}">${branch.name}</option>`;
         branchSelect.lastChild.addEventListener("change", displayBranch(branch));
     }
+    */
 }
 
 
@@ -74,14 +79,13 @@ document.getElementById("createBranchBtn").addEventListener("click", async (e) =
 
     let selectedBranchCommit = null;
 
-    for (let branch of repository.branches) {
-        if (branch.name == branchSelect.value) {
-            selectedBranchCommit = branch.latestCommit;
-            break;
-        }
-    }    
+    var currentBranch = sessionStorage.getItem("Branch");
+    const currentBtnBranch = document.getElementById(currentBranch);
 
-    if (selectedBranchCommit == null) {
+    console.log(currentBtnBranch.dataset.commit);
+
+
+    if (currentBtnBranch.dataset.commit == null) {
         alert("No se puede crear un branch a partir de un branch sin commits");
         return;
     }
@@ -131,7 +135,7 @@ document.getElementById("deleteBranchBtn").addEventListener("click", async (e) =
 });
 
 function isAlphanumeric(text) {
-    const alphanumericRegex = /^[a-z0-9 ]+$/i;
+    const alphanumericRegex = /^[a-z0-9 -]+$/i;
     return alphanumericRegex.test(text);
 }
 

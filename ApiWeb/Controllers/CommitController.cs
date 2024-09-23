@@ -25,10 +25,10 @@ namespace ApiWeb.Controllers
         }
 
         [HttpGet]
-        [Route("RetrieveAll")]
-        public ActionResult GetAll(string currentBranch)
+        [Route("{repositoryId}/RetrieveAll/{currentBranch}")]
+        public ActionResult GetAll(string repositoryId, string currentBranch)
         {
-            return Ok(repositorioDB.getAllCommits(currentBranch)); 
+            return Ok(repositorioDB.getAllCommits(repositoryId, currentBranch)); 
         }
 
 
