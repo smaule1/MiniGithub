@@ -16,6 +16,7 @@ const confirmBtnContainer = document.getElementById("confirmBtnContainer");
 
 let repository = null;
 let selectedComment = null;
+let usersList = null;
 let commentsBase = null;
 let comments = null;
 
@@ -40,6 +41,8 @@ async function loadRepo(id) {
         displayRepository(repository);
 
         checkUserPermission(repository);
+
+        await loadRepoComments(id);
 
     } catch (error) {
         console.error(error.message);
@@ -185,7 +188,7 @@ async function loadRepoComments(repoId) {
         comments = await commResponse.json();
 
         if (Array.isArray(comments)) {
-            displayComments(comments);
+            await displayComments(comments);
         }
 
     } catch (error) {
@@ -200,9 +203,9 @@ async function insertComment(commentMessage) {
         const commResponse = await fetch(commentsUrl, {
             method: "POST",
             body: JSON.stringify({
-                user: "user", // Change to userId
+                user: sessionStorage.getItem("_User"),
                 message: commentMessage,
-                repoId: "string", // Change to repoId
+                repoId: repository.id,
                 subcomments: []
             }),
             headers: { "Content-Type": "application/json" }
@@ -227,7 +230,7 @@ async function deleteComment(commentId) {
             throw new Error(`Response status: ${commResponse.status}`);
         }
 
-        loadRepoComments("string"); // Change to repoId
+        loadRepoComments(repository.id);
 
     } catch (error) {
         console.error(error.message);
@@ -241,7 +244,7 @@ async function insertSubcomment(commentId, commentMessage) {
         const commResponse = await fetch(commentsUrl, {
             method: "POST",
             body: JSON.stringify({
-                user: "user", // Change to userId
+                user: sessionStorage.getItem("_User"),
                 message: commentMessage,
             }),
             headers: { "Content-Type": "application/json" }
@@ -263,7 +266,7 @@ async function deleteSubcomment(commentId, commentMessage) {
         const commResponse = await fetch(commentsUrl, {
             method: "DELETE",
             body: JSON.stringify({
-                user: "user", // Change to userId
+                user: sessionStorage.getItem("_User"),
                 message: commentMessage,
             }),
             headers: { "Content-Type": "application/json" }
@@ -279,8 +282,10 @@ async function deleteSubcomment(commentId, commentMessage) {
 }
 
 
-function displayComments(commentsList) {
+async function displayComments(commentsList) {
     let containerHTML = "";
+    usersList = getUsers();
+
     commentsList.forEach(comment => {
         containerHTML += commentFormat(comment);
     })
@@ -298,7 +303,7 @@ function commentFormat(commentObj) {
     let commentHTML = `<div class="card mt-3 shadow-lg" id="${commentObj.id}">
                                     <div class="comment-header bg-primary text-white p-3">
                                         <div>
-                                            <span class="card-title mb-0">${commentObj.user}</span>
+                                            <span class="card-title mb-0">${getUsername(commentObj.user)}</span>
                                             <span class="comment-date">${getDate(commentObj)}</span>
                                         </div>
                                         <div class="button-container">
@@ -329,18 +334,18 @@ function commentFormat(commentObj) {
 
 function subcommentFormat(subcommentObj, commentId, index) {
     let subcommentHTML = `<div class="subcomment" id="${commentId}[subcomments][${index}]">
-                                        <div class="comment-header bg-secondary text-white p-2">
-                                            <div>
-                                                <span class="card-title mb-0">${subcommentObj.user}</span>
-                                                <span class="comment-date">${getDate(subcommentObj)}</span>
-                                            </div>
-                                            <div class="button-container">
-                                                <button class="delete-btn subcomment-btn">Eliminar</button>
-                                                <button class="edit-btn subcomment-btn">Editar</button>
-                                            </div>
-                                        </div>
-                                        <div class="comment-message p-2">${subcommentObj.message}</div>
-                                    </div>`;
+                                <div class="comment-header bg-secondary text-white p-2">
+                                    <div>
+                                        <span class="card-title mb-0">${getUsername(subcommentObj.user)}</span>
+                                        <span class="comment-date">${getDate(subcommentObj)}</span>
+                                    </div>
+                                    <div class="button-container">
+                                        <button class="delete-btn subcomment-btn">Eliminar</button>
+                                        <button class="edit-btn subcomment-btn">Editar</button>
+                                    </div>
+                                </div>
+                                <div class="comment-message p-2">${subcommentObj.message}</div>
+                            </div>`;
 
     return subcommentHTML;
 }
@@ -402,7 +407,7 @@ function setDeleteAction() {
         deleteBtn.addEventListener("click", async (e) => {
             const commentId = e.currentTarget.parentNode.parentNode.parentNode.id;
             await deleteComment(commentId);
-            loadRepoComments("string"); // Change to repoId
+            loadRepoComments(repository.id);
         });
     });
 
@@ -411,7 +416,7 @@ function setDeleteAction() {
             const subcommentId = e.currentTarget.parentNode.parentNode.parentNode.id;
             const message = document.getElementById(subcommentId).getElementsByClassName("comment-message")[0].textContent;
             await deleteSubcomment(getCommentId(subcommentId), message);
-            loadRepoComments("string"); // Change to repoId
+            loadRepoComments(repository.id);
         });
     });
 }
@@ -492,11 +497,38 @@ function resetCommentsView() {
 }
 
 async function updateCommentsView() {
-    await loadRepoComments("string"); // Change to repoId
+    await loadRepoComments(repository.id);
     confirmBtnContainer.innerHTML = "";
 }
 
 function getCommentId(subcommentId) {
     const regex = /^([^\[]+)\[subcomments\]\[(\d+)\]$/;
     return subcommentId.match(regex)[1];
+}
+
+async function getUsers() {
+    const url = `https://localhost:7269/api/usuario`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const users = await response.json();
+        return users;
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+function getUsername(userId) {
+    try {
+        const user = usersList.find(u => u.id == userId);
+        return user.name;
+
+    } catch (error) {
+        console.error(error.message);
+        return userId;
+    }
 }
