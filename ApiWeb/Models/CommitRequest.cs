@@ -26,7 +26,8 @@ namespace ApiWeb.Models
         [Required]
         public int Version { get; set; }
 
-        public string? Message { get; set; }
+        [Required]
+        public string Message { get; set; }
 
         [Required]
         public List<IFormFile> File { get; set; }

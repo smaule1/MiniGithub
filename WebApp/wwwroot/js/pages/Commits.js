@@ -1,5 +1,15 @@
 ﻿sessionStorage.setItem("Branch", "Master");
 
+/*
+var test = [
+    {
+        name: "Master",
+        latestCommit: ""
+    },
+]
+sessionStorage.setItem("AllBranches", JSON.stringify(test));
+*/
+
 function changeDropdown(text) {
     //Se mete la branch actual dentro del storage local
     sessionStorage.setItem("Branch", text);
@@ -186,10 +196,9 @@ function branchController() {
   
 }
 
-
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
     branchController();
     var commitCreator = new createCommit();
     commitController();
 
-});
+}, false);

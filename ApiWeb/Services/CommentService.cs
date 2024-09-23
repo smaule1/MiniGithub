@@ -15,6 +15,7 @@ namespace ApiWeb.Services
         private readonly Cluster _cluster;
         [Required]
         private readonly Cassandra.ISession _session;
+
         const string colId = "id", colUser = "user", colMessage = "message", colCreationDate = "creation_date",
             colLastDate = "last_date", colSubcomments = "subcomments", colRepoId = "repo_id";
         
@@ -22,6 +23,7 @@ namespace ApiWeb.Services
         {
             _cluster = Cluster.Builder()
                               .AddContactPoint(options.Value.ContactPoint)
+                              .WithPort(options.Value.Port)
                               .Build();
             _session = _cluster.Connect(options.Value.Keyspace);
 

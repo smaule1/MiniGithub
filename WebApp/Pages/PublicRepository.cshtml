@@ -10,8 +10,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="~/js/pages/PublicRepository.js" defer></script>
     <script src="~/js/pages/Commits.js" defer></script>
+    <script src="~/js/pages/PublicRepository.js" defer></script>
+    
 
     <link rel="stylesheet" href="~/css/Commit.css" asp-append-version="true" />
 
@@ -182,14 +183,14 @@
                 <button id="modifyBtn" type="button" class="btn btn-primary w-100 m-2">Modificar Repositorio</button>
                 <button id="deleteBtn" type="button" class="btn btn-danger w-100 m-2">Eliminar Repositorio</button>
                 <hr />
-                <div class="accordion accordion" id="accordionFlushExample">
+                <div class="accordion accordion" id="accordionFlush">
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            <button class="accordion-button collapsed " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
                                 Crear Branch
                             </button>
                         </h2>
-                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlush">
                             <div class="accordion-body">
                                 <input id="branchNameInput" type="text" class="form-control" placeholder="Nombre del Branch" />
                                 <button id="createBranchBtn" type="button" class="btn btn-primary w-100 mt-2">Crear Branch</button>

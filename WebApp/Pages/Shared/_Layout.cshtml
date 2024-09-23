@@ -30,16 +30,16 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item" id="registro">
+                        <li class="nav-item d-none" id="registro">
                             <a class="nav-link text-dark" asp-area="" asp-page="/RegistroUsuario">Registro</a>
                         </li>
-                        <li class="nav-item" id="inicioSesion">
+                        <li class="nav-item d-none" id="inicioSesion">
                             <a class="nav-link text-dark" asp-area="" asp-page="/InicioSesion">Inicio de Sesión</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Search">Buscar</a>
                         </li>
-                        <li class="nav-item" id="repositorios">
+                        <li class="nav-item d-none" id="repositorios">
                             <a class="nav-link text-dark" asp-area="" asp-page="/UserPage">Mis Repositorios</a>
                         </li>
                     </ul>
@@ -65,6 +65,8 @@
             var session = sessionStorage.getItem("_SessionId");
 
             if (session == null || session == ""){
+                document.getElementById("registro").classList.remove("d-none");
+                document.getElementById("inicioSesion").classList.remove("d-none");
                 return;
             }
 
@@ -80,35 +82,35 @@
                     let obj = await response.json();
                     if (obj.error == "Not Auth"){
                         if (obj.type == "Not valid") {
-                            $('#registro').removeClass('d-none');
-                            $('#inicioSesion').removeClass('d-none');
-                            $('#repositorios').addClass('d-none');
+                            document.getElementById("registro").classList.remove("d-none");
+                            document.getElementById("inicioSesion").classList.remove("d-none");
+                            document.getElementById("repositorios").classList.add("d-none");
                             console.error(obj.message);
                         }
                         if (obj.type == "No session") {
-                            $('#registro').removeClass('d-none');
-                            $('#inicioSesion').removeClass('d-none');
-                            $('#repositorios').addClass('d-none');
+                            document.getElementById("registro").classList.remove("d-none");
+                            document.getElementById("inicioSesion").classList.remove("d-none");
+                            document.getElementById("repositorios").classList.add("d-none");
                             console.error(obj.message);
                         }
                     }
                     if (obj.error == "Not Found") {
-                        $('#registro').removeClass('d-none');
-                        $('#inicioSesion').removeClass('d-none');
-                        $('#repositorios').addClass('d-none');
+                        document.getElementById("registro").classList.remove("d-none");
+                        document.getElementById("inicioSesion").classList.remove("d-none");
+                        document.getElementById("repositorios").classList.add("d-none");
                         console.error(obj.message);
                     }
                     sessionStorage.setItem("_SessionId", "");
                 } else {
-                    $('#registro').addClass('d-none');
-                    $('#inicioSesion').addClass('d-none');
-                    $('#repositorios').removeClass('d-none');
+                    document.getElementById("registro").classList.add("d-none");
+                    document.getElementById("inicioSesion").classList.add("d-none");
+                    document.getElementById("repositorios").classList.remove("d-none");
                 }
             } catch (error) {
                 sessionStorage.setItem("_SessionId", "");
-                $('#registro').removeClass('d-none');
-                $('#inicioSesion').removeClass('d-none');
-                $('#repositorios').addClass('d-none');
+                document.getElementById("registro").classList.remove("d-none");
+                document.getElementById("inicioSesion").classList.remove("d-none");
+                document.getElementById("repositorios").classList.add("d-none");
                 console.error(error.message);
             }
         });
