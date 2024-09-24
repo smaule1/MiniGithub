@@ -11,6 +11,7 @@ namespace ApiWeb.Services
     {
         [Required]
         private static readonly Lazy<ConnectionMultiplexer> _lazyConnection;
+        
 
         public static ConnectionMultiplexer Connection
         {
@@ -22,8 +23,13 @@ namespace ApiWeb.Services
 
         static UserService()
         {
+            var options = ConfigurationOptions.Parse("54.197.24.238:6379"); 
+            options.Password = "d3jenDeHacke4rmed$&TEsMKncxLaCKklLdAazV6hdR5&CR4YEB52xJw#vLTqJr&U72^wVJHxqpw2e";
+            var HOST_NAME = "54.197.24.238";
+            var PORT_NUMBER = "6379";
+            var PASSWORD = "d3jenDeHacke4rmed$&TEsMKncxLaCKklLdAazV6hdR5&CR4YEB52xJw#vLTqJr&U72^wVJHxqpw2e";
             _lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
-                ConnectionMultiplexer.Connect("54.197.24.238")
+                ConnectionMultiplexer.Connect($"{HOST_NAME}:{PORT_NUMBER},password={PASSWORD}")
             );
         }
 
